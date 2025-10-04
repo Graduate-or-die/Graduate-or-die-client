@@ -1,7 +1,22 @@
 apply plugin: "com.android.application"
 
-import com.android.build.OutputFile
-import org.apache.tools.ant.taskdefs.condition.Os
+/*android.applicationVariants.all { variant ->
+    variant.outputs.all { output ->
+        def abi = output.getFilter("ABI")
+    }
+}*/
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'org.apache.ant:ant:1.10.12'
+    }
+}
+
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -230,7 +245,7 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
-
+/*
     // applicationVariants are e.g. debug, release
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
@@ -245,7 +260,7 @@ android {
             }
 
         }
-    }
+    }*/
 }
 
 dependencies {
@@ -277,6 +292,12 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    implementation project(':react-native-gesture-handler')
+    implementation project(':react-native-reanimated')
+    implementation project(':react-native-safe-area-context')
+    implementation project(':react-native-screens')
+    implementation project(':react-native-vector-icons')
+
 }
 
 if (isNewArchitectureEnabled()) {
