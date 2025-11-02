@@ -1,0 +1,74 @@
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import * as S from "./TabBar.style";
+import {
+  TabHomeOn,
+  TabHomeOff,
+  TabChatOn,
+  TabChatOff,
+  TabMateOn,
+  TabMateOff,
+  TabMyOn,
+  TabMyOff,
+} from "../../icons";
+type Tab = "home" | "chat" | "mate" | "my";
+const tabItems: {
+  key: Tab;
+  label: string;
+  icon: React.ReactNode;
+  activeIcon: React.ReactNode;
+  path?: string;
+}[] = [
+  {
+    key: "home",
+    label: "Home",
+    icon: <TabHomeOff width={36} height={36} />,
+    activeIcon: <TabHomeOn width={36} height={36} />,
+    path: "/home",
+  },
+  {
+    key: "chat",
+    label: "Mate Chat",
+    icon: <TabChatOff width={36} height={36} />,
+    activeIcon: <TabChatOn width={36} height={36} />,
+    path: "/chat",
+  },
+  {
+    key: "mate",
+    label: "Mate",
+    icon: <TabMateOff width={36} height={36} />,
+    activeIcon: <TabMateOn width={36} height={36} />,
+    path: "/mate",
+  },
+  {
+    key: "my",
+    label: "MyPage",
+    icon: <TabMyOff width={36} height={36} />,
+    activeIcon: <TabMyOn width={36} height={36} />,
+    path: "/my",
+  },
+];
+
+export default function TabBar() {
+  const [activeTab, setActiveTab] = useState<Tab>("home");
+  const navigate = useNavigate();
+
+  const handleClick = (tab: (typeof tabItems)[number]) => {
+    setActiveTab(tab.key);
+    if (tab.path) {
+      navigate(tab.path);
+    }
+  };
+  return (
+    <S.TabBar>
+      {tabItems.map((tab) => (
+        <S.Icons key={tab.key} onClick={() => handleClick(tab)}>
+          {activeTab === tab.key ? tab.activeIcon : tab.icon}
+          <S.TextLabel isActive={activeTab === tab.key}>
+            {tab.label}
+          </S.TextLabel>
+        </S.Icons>
+      ))}
+    </S.TabBar>
+  );
+}

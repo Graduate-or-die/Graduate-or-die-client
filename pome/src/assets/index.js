@@ -1,0 +1,1 @@
+export {ReactComponent as DefaultProfile} from './default-profile.svg';
