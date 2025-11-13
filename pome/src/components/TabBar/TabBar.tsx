@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import * as S from "./TabBar.style";
 import {
   TabHomeOn,
@@ -17,7 +17,7 @@ const tabItems: {
   label: string;
   icon: React.ReactNode;
   activeIcon: React.ReactNode;
-  path?: string;
+  path: string;
 }[] = [
   {
     key: "home",
@@ -50,12 +50,15 @@ const tabItems: {
 ];
 
 export default function TabBar() {
-  const [activeTab, setActiveTab] = useState<Tab>("home");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const activeTab =
+    tabItems.find((tab) => location.pathname.startsWith(tab.path))?.key ||
+    "home";
 
   const handleClick = (tab: (typeof tabItems)[number]) => {
-    setActiveTab(tab.key);
-    if (tab.path) {
+    if (tab.path !== location.pathname) {
       navigate(tab.path);
     }
   };
