@@ -4,6 +4,7 @@ import { Global, css } from "@emotion/react";
 import { PomeStyles } from "./styles/PomeStyles.style";
 import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
+import HomePage from "./pages/HomePage";
 export default function App() {
   return (
     <>
@@ -11,6 +12,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/my" element={<MyPage />} />
+        <Route path="/home" element={<HomePage />} />
       </Routes>
     </>
   );
