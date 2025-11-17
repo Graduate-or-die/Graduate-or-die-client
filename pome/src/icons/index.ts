@@ -18,3 +18,5 @@ export { ReactComponent as Down } from "./Down.svg";
 export { ReactComponent as Star } from "./Star.svg";
 export { ReactComponent as ToggleRight } from "./Toggle-right.svg";
 export { ReactComponent as ToggleDown } from "./Toggle-down.svg";
+export { ReactComponent as Plus } from "./Plus.svg";
+export { ReactComponent as Trash } from "./Trash.svg";
