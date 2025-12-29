@@ -5,6 +5,7 @@ import { PomeStyles } from "./styles/PomeStyles.style";
 import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import DetailPage from "./pages/DetailPage";
 export default function App() {
   return (
     <>
@@ -13,6 +14,7 @@ export default function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/my" element={<MyPage />} />
         <Route path="/home" element={<HomePage />} />
+        <Route path="/detail/:category" element={<DetailPage />} />
       </Routes>
     </>
   );
