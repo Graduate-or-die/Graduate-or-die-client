@@ -15,7 +15,10 @@ export default function DetailHeader({ category }: DetailHeaderProps) {
   const goBack = () => {
     navigate(-1);
   };
-  const title = CATEGORIES[category as keyof typeof CATEGORIES];
+  const title =
+    category === "education" || category === "experience"
+      ? "학력/경력"
+      : CATEGORIES[category as keyof typeof CATEGORIES];
   return (
     <>
       <S.DetailHeader>

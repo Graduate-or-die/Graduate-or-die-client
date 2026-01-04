@@ -11,13 +11,14 @@ export type Field = {
 
 export const CATEGORY_FIELDS: Record<CategoryKey, Field[]> = {
   education: [
-    { name: "school", label: "학교", group: "education" },
-    { name: "major", label: "전공", group: "education" },
-    { name: "degree", label: "학위", group: "education" },
-
-    { name: "place", label: "근무지", group: "experience" },
-    { name: "state", label: "직위", group: "experience" },
-    { name: "period", label: "근무기간", kind: "period", group: "experience" },
+    { name: "school", label: "학교" },
+    { name: "major", label: "전공" },
+    { name: "degree", label: "학위" },
+  ],
+  experience: [
+    { name: "place", label: "근무지" },
+    { name: "state", label: "직위" },
+    { name: "period", label: "근무기간", kind: "period" },
   ],
   activity: [
     { name: "name", label: "활동명" },
@@ -53,4 +54,3 @@ export const CATEGORY_FIELDS: Record<CategoryKey, Field[]> = {
     { name: "memo", label: "메모", kind: "memo" },
   ],
 };
-

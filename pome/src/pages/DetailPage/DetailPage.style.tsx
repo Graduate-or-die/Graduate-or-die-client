@@ -5,10 +5,6 @@ export const DoneTrashContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  svg {
-    position: relative;
-    top: 25px;
-  }
 `;
 export const DoneBox = styled.div`
   margin-top: 60px;
@@ -32,10 +28,19 @@ export const FormContainer = styled.div`
   margin-top: 20px;
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 `;
 
 export const PlusBox = styled.div`
   display: flex;
   justify-content: center;
   margin-top: 20px;
+  padding-bottom: 110px;
+`;
+
+export const TrashIconWrapper = styled.div`
+  margin-top: 60px;
+  cursor: pointer;
 `;

@@ -182,7 +182,7 @@ export const LinkBox = styled.input`
   font-family: "Pretendard Variable";
   font-size: 11px;
   font-style: normal;
-  font-weight: 200;
+  font-weight: 400;
   line-height: normal;
   white-space: nowrap;
   overflow: hidden;
@@ -190,6 +190,14 @@ export const LinkBox = styled.input`
   box-sizing: border-box;
   padding: 0 10px;
   line-height: 30px;
+`;
+export const LinkAdd = styled.div`
+  width: 325px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 5px 0;
 `;
 export const Memo = styled.textarea`
   width: 323px;
@@ -199,4 +207,27 @@ export const Memo = styled.textarea`
   box-sizing: border-box;
   padding: 10px;
   line-height: 1.5;
+`;
+
+export const FormHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`;
+
+export const SelectCircle = styled.div`
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #0086ab;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 20px;
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 `;

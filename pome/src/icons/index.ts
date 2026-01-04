@@ -22,3 +22,4 @@ export { ReactComponent as ToggleDown } from "./Toggle-down.svg";
 export { ReactComponent as Plus } from "./Plus.svg";
 export { ReactComponent as Trash } from "./Trash.svg";
 export { ReactComponent as Link } from "./Link.svg";
+export { ReactComponent as SelectCheck } from "./SelectCheck.svg";
