@@ -1,5 +1,5 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import styled from "@emotion/styled";
+import { css } from "@emotion/react";
 
 export const PomeStyles = css`
   html,
@@ -40,6 +40,7 @@ export const PomeStyles = css`
     font-family: inherit;
     border: none;
     outline: none;
+    padding: 0;
   }
 
   b {
@@ -56,6 +57,5 @@ export const PomeStyles = css`
     margin: 0 auto;
     background-color: white;
     overflow-y: auto;
-    
   }
 `;

@@ -1,5 +1,6 @@
 export { ReactComponent as Alarm } from "./Alarm.svg";
 export { ReactComponent as ArrowLeft } from "./ArrowLeft.svg";
+export { ReactComponent as Check } from "./Check.svg";
 export { ReactComponent as EditPencil } from "./EditPencil.svg";
 export { ReactComponent as PomeLogo } from "./PomeLogo.svg";
 export { ReactComponent as HeartOn } from "./Heart-on.svg";
@@ -18,3 +19,7 @@ export { ReactComponent as Down } from "./Down.svg";
 export { ReactComponent as Star } from "./Star.svg";
 export { ReactComponent as ToggleRight } from "./Toggle-right.svg";
 export { ReactComponent as ToggleDown } from "./Toggle-down.svg";
+export { ReactComponent as Plus } from "./Plus.svg";
+export { ReactComponent as Trash } from "./Trash.svg";
+export { ReactComponent as Link } from "./Link.svg";
+export { ReactComponent as SelectCheck } from "./SelectCheck.svg";
