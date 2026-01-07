@@ -5,7 +5,7 @@ import { Trash, Plus } from "../../icons";
 import DetailForm from "../../components/DetailForm";
 import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
-import { TabBar } from "../../components/TabBar/TabBar.style";
+import TabBar from "../../components/TabBar";
 import { DETAIL_DEFAULT_BY_CATEGORY } from "../../constants/defaultDetailItem";
 import { DetailItem } from "../../types/detail";
 import { v4 as uuid } from "uuid";
