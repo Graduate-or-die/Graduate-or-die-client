@@ -12,7 +12,11 @@ export const SearchContainer = styled.div`
   box-sizing: border-box;
 `;
 
-export const SearchBox = styled.div`
+export const SearchBox = styled.input`
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
   color: #5b5b5b;
   font-family: "Pretendard Variable";
   font-size: 15px;
@@ -20,6 +24,7 @@ export const SearchBox = styled.div`
   font-weight: 400;
   line-height: normal;
   width: 300px;
+  text-align: center;
 `;
 export const RecommendContainer = styled.div`
   width: 315px;
@@ -66,11 +71,14 @@ export const NickNameBox = styled.div`
   height: 25px;
   margin: 0 auto 36px;
 `;
-export const SlideBox = styled.div`
+export const SlideBox = styled.div<{ isHidden: boolean }>`
   display: flex;
   gap: 260px;
   align-items: center;
   justify-content: center;
+  opacity: ${({ isHidden }) => (isHidden ? 0 : 1)};
+  visibility: ${({ isHidden }) => (isHidden ? "hidden" : "visible")};
+  pointer-events: ${({ isHidden }) => (isHidden ? "none" : "auto")};
 `;
 export const SlideIcon = styled.div``;
 export const InfoContainer = styled.div`
