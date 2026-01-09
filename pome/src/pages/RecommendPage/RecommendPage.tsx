@@ -1,0 +1,83 @@
+import React, { useState } from "react";
+import * as S from "./RecommendPage.style";
+import RecommendHeader from "../../components/RecommendHeader";
+import TabBar from "../../components/TabBar";
+import {
+  RecommendProfile,
+  RECOMMEND_DEFAULT_LIST,
+} from "../../constants/RecommendProfile";
+import { HeartOn, Search, SlideLeft, SlideRight } from "../../icons";
+import { DefaultProfile } from "../../assets";
+import Badge from "../../components/Badge";
+export default function RecommendPage() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const currentProfile = RECOMMEND_DEFAULT_LIST[currentIndex];
+
+  const handleNext = () => {
+    setCurrentIndex((prev) =>
+      prev === RECOMMEND_DEFAULT_LIST.length - 1 ? 0 : prev + 1
+    );
+  };
+  const handlePrev = () => {
+    setCurrentIndex((prev) =>
+      prev === 0 ? RECOMMEND_DEFAULT_LIST.length - 1 : prev - 1
+    );
+  };
+
+  return (
+    <>
+      <RecommendHeader />
+      <S.SearchContainer>
+        <S.SearchBox />
+        <Search />
+      </S.SearchContainer>
+      <S.RecommendContainer>
+        <S.HeartBox>
+          <HeartOn />
+          <S.HeartCounter>{currentProfile.heartCount}</S.HeartCounter>
+        </S.HeartBox>
+        <S.ProfileImageBox>
+          {currentProfile.profileImageUrl ? (
+            <img src={currentProfile.profileImageUrl} alt="profile" />
+          ) : (
+            <DefaultProfile />
+          )}
+        </S.ProfileImageBox>
+        <S.NickNameBox>{currentProfile.nickname}</S.NickNameBox>
+        <S.SlideBox>
+          <S.SlideIcon>
+            <SlideLeft onClick={handlePrev} />
+          </S.SlideIcon>
+          <S.SlideIcon>
+            <SlideRight onClick={handleNext} />
+          </S.SlideIcon>
+        </S.SlideBox>
+        <S.InfoContainer>
+          <S.InfoBox>
+            <S.KeyBox>태그</S.KeyBox>
+            <S.ValueBox>
+              {currentProfile.tags.map((tag) => (
+                <Badge key={tag} label={tag} height={26} fontSize={15} />
+              ))}
+            </S.ValueBox>
+          </S.InfoBox>
+          <S.InfoBox>
+            <S.KeyBox>자기소개</S.KeyBox>
+            <S.ValueBox>{currentProfile.introduction}</S.ValueBox>
+          </S.InfoBox>
+          <S.InfoBox>
+            <S.KeyBox>희망 직무</S.KeyBox>
+            <S.ValueBox>{currentProfile.job}</S.ValueBox>
+          </S.InfoBox>
+          <S.InfoBox>
+            <S.KeyBox>포트폴리오 ai 한줄 요약</S.KeyBox>
+            <S.ValueBox>{currentProfile.aiSummary}</S.ValueBox>
+          </S.InfoBox>
+        </S.InfoContainer>
+        <S.MatchingButton>매칭 신청</S.MatchingButton>
+      </S.RecommendContainer>
+      <TabBar />
+    </>
+  );
+}

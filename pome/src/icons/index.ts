@@ -23,3 +23,7 @@ export { ReactComponent as Plus } from "./Plus.svg";
 export { ReactComponent as Trash } from "./Trash.svg";
 export { ReactComponent as Link } from "./Link.svg";
 export { ReactComponent as SelectCheck } from "./SelectCheck.svg";
+export { ReactComponent as Friends } from "./Friends.svg";
+export { ReactComponent as Search } from "./Search.svg";
+export { ReactComponent as SlideLeft } from "./SlideLeft.svg";
+export { ReactComponent as SlideRight } from "./SlideRight.svg";

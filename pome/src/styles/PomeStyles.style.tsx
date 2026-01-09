@@ -53,9 +53,12 @@ export const PomeStyles = css`
     width: 100%;
     min-width: 320px;
     max-width: 768px;
-    height: 100vh;
+    min-height: 100vh;
     margin: 0 auto;
     background-color: white;
     overflow-y: auto;
+  }
+  * {
+    box-sizing: border-box;
   }
 `;
