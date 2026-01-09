@@ -61,3 +61,5 @@ export const Dropdown = styled.div`
   border-radius: 0 0 20px 20px;
   padding: 10px 30px 15px 30px;
 `;
+
+export const ToggleBox = styled.div``;
