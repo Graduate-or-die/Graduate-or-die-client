@@ -4,14 +4,16 @@ import { v4 as uuid } from "uuid";
 // 화면 확인용 디폴트 데이터
 export const DETAIL_DEFAULT_BY_CATEGORY: Record<
   CategoryKey,
-  Record<string, any>
+  Record<string, any>[]
 > = {
-  education: {
-    id: uuid(),
-    school: "숙명여자대학교",
-    major: "데이터사이언스",
-    degree: "학사",
-  },
+  education: [
+    {
+      id: uuid(),
+      school: "숙명여자대학교",
+      major: "데이터사이언스",
+      degree: "학사",
+    },
+  ],
   experience: [
     {
       id: uuid(),
@@ -91,9 +93,11 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
     },
   ],
 
-  etc: {
-    id: uuid(),
-    content: ["https://github.com/username"],
-    memo: "포트폴리오 링크",
-  },
+  etc: [
+    {
+      id: uuid(),
+      content: ["https://github.com/username", "https://instagram/username"],
+      memo: "포트폴리오 링크",
+    },
+  ],
 };

@@ -20,8 +20,8 @@ export default function DetailPage() {
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [education, setEducation] = useState<DetailItem>({
+    ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
     id: uuid(),
-    ...DETAIL_DEFAULT_BY_CATEGORY.education,
   });
   const [experiences, setExperiences] = useState<DetailItem[]>([]);
   const [items, setItems] = useState<DetailItem[]>([]);
@@ -29,9 +29,12 @@ export default function DetailPage() {
   useEffect(() => {
     switch (safeCategory) {
       case "education":
-        setEducation({ ...DETAIL_DEFAULT_BY_CATEGORY.education, id: uuid() });
+        setEducation({
+          ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
+          id: uuid(),
+        });
         setExperiences(
-          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e: DetailItem) => ({
+          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e) => ({
             ...e,
             id: uuid(),
           }))
@@ -39,15 +42,19 @@ export default function DetailPage() {
         break;
 
       case "etc":
-        setItems([{ ...DETAIL_DEFAULT_BY_CATEGORY.etc, id: uuid() }]);
+        setItems(
+          DETAIL_DEFAULT_BY_CATEGORY.etc.map((e) => ({
+            ...e,
+            id: uuid(),
+          }))
+        );
+
         break;
 
       default:
         const defaultData = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
         if (Array.isArray(defaultData)) {
           setItems(defaultData.map((e) => ({ ...e, id: uuid() })));
-        } else {
-          setItems([{ ...defaultData, id: uuid() }]);
         }
         break;
     }
