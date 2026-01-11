@@ -1,8 +1,9 @@
 import styled from "@emotion/styled";
 export const PageWrapper = styled.div`
   position: relative;
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
+  background-color: #ffffff;
 `;
 
 export const ContentWrapper = styled.div`

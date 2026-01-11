@@ -5,7 +5,7 @@ export const SearchContainer = styled.div`
   border-radius: 20px;
   border: 0.7px solid #006f8e;
   background: rgba(206, 214, 216, 0.3);
-  margin: 80px auto 10px;
+  margin: 10px auto;
   padding: 0 30px;
   display: flex;
   align-items: center;

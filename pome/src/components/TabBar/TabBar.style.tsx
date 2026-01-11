@@ -3,8 +3,9 @@ export const TabBar = styled.div`
   display: flex;
   justify-content: space-around;
   align-items: baseline;
-  height: 88px;
+  height: 82px;
   width: 100%;
+  max-width: 430px;
   border-radius: 30px 30px 0 0;
   background: #fff;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
