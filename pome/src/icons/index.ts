@@ -27,3 +27,4 @@ export { ReactComponent as Friends } from "./Friends.svg";
 export { ReactComponent as Search } from "./Search.svg";
 export { ReactComponent as SlideLeft } from "./SlideLeft.svg";
 export { ReactComponent as SlideRight } from "./SlideRight.svg";
+export { ReactComponent as Lock } from "./Lock.svg";

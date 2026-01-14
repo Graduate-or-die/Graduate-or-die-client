@@ -7,6 +7,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import DetailPage from "./pages/DetailPage";
 import RecommendPage from "./pages/RecommendPage";
+import MateRouter from "./pages/MateRouter";
 export default function App() {
   return (
     <>
@@ -15,8 +16,8 @@ export default function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/my" element={<MyPage />} />
         <Route path="/home" element={<HomePage />} />
-        <Route path="/detail/:category" element={<DetailPage />} />
-        <Route path="/mate" element={<RecommendPage />} />
+        <Route path="/home/detail/:category" element={<DetailPage />} />
+        <Route path="/mate" element={<MateRouter />} />
       </Routes>
     </>
   );

@@ -62,4 +62,17 @@ export const Dropdown = styled.div`
   padding: 10px 30px 15px 30px;
 `;
 
-export const ToggleBox = styled.div``;
+export const ToggleBox = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+`;
+export const LockedContainer = styled.div`
+  width: 364px;
+  margin: 14px;
+  border-radius: 20px;
+  background: #ced6d8;
+  box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
+`;
