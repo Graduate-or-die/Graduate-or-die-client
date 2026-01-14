@@ -1,17 +1,20 @@
 import styled from "@emotion/styled";
 export const MateHomeWrapper = styled.div`
-  margin-top: 90px;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+`;
+export const CenterWrapper = styled.div`
+  max-width: 390px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 `;
 export const BadgeContainer = styled.div`
-  width: 100%;
-  max-width: 364px;
   display: flex;
   gap: 10px;
-  margin-bottom: 10px;
-  pointer: cursor;
 `;
 export const TabBadge = styled.div`
   width: 88px;
@@ -44,5 +47,14 @@ export const PageWrapper = styled.div`
 export const ContentWrapper = styled.div`
   overflow-y: auto;
   scrollbar-width: none;
+  padding-top: 90px;
   padding-bottom: 150px;
+`;
+
+export const HomeMenu = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  gap: 14px;
 `;

@@ -11,11 +11,15 @@ export default function Header() {
     <>
       <S.Header>
         <S.HeaderBox>
-          <button onClick={goBack}>
-            <ArrowLeft/>
-          </button>
+          <S.LeftBox>
+            <button onClick={goBack}>
+              <ArrowLeft />
+            </button>
+          </S.LeftBox>
           <PomeLogo />
-          <Alarm />
+          <S.RightBox>
+            <Alarm />
+          </S.RightBox>
         </S.HeaderBox>
       </S.Header>
     </>

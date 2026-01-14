@@ -15,7 +15,7 @@ export const HeaderBox = styled.div`
   width: 100%;
   flex-direction: row;
   display: inline-flex;
-  padding: 0 22px;
+  padding: 0 24px;
   justify-content: space-between;
   align-items: center;
 `;

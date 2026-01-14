@@ -12,22 +12,25 @@ export default function HomePage() {
     <>
       <S.PageWrapper>
         <Header />
+
         <S.ContentWrapper>
-          <S.HomeMenu>
-            <Menu
-              data={DETAIL_DEFAULT_BY_CATEGORY}
-              basePath="home"
-              isOwner={true}
-            />
-          </S.HomeMenu>
-          <S.AiTagContainer>
-            <S.AiTagBox>
-              <Star />
-              AI 기반 생성 태그
-            </S.AiTagBox>
-            <HomeBadge label="대회마스터" />
-            <HomeBadge label="프론트엔드개발자" />
-          </S.AiTagContainer>
+          <S.CenterWrapper>
+            <S.HomeMenu>
+              <Menu
+                data={DETAIL_DEFAULT_BY_CATEGORY}
+                basePath="home"
+                isOwner={true}
+              />
+            </S.HomeMenu>
+            <S.AiTagContainer>
+              <S.AiTagBox>
+                <Star />
+                AI 기반 생성 태그
+              </S.AiTagBox>
+              <HomeBadge label="대회마스터" />
+              <HomeBadge label="프론트엔드개발자" />
+            </S.AiTagContainer>
+          </S.CenterWrapper>
         </S.ContentWrapper>
         <S.TabBarWrapper>
           <TabBar />

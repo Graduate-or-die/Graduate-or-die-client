@@ -1,10 +1,9 @@
 import styled from "@emotion/styled";
 export const MenuContainer = styled.div`
-  width: 364px;
+  width: 100%;
   border-radius: 20px;
   background: rgba(206, 214, 216, 0.3);
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);
-  margin: 14px;
 `;
 export const MenuBox = styled.div`
   color: #313334;
@@ -34,7 +33,7 @@ export const DropBox = styled.div`
   line-height: 30px;
 `;
 export const BorderLine = styled.div`
-  width: 325px;
+  width: 100%;
   height: 0.3px;
   background: #313334;
   margin: 0 auto;
@@ -70,8 +69,7 @@ export const ToggleBox = styled.div`
   height: 20px;
 `;
 export const LockedContainer = styled.div`
-  width: 364px;
-  margin: 14px;
+  width: 100%;
   border-radius: 20px;
   background: #ced6d8;
   box-shadow: 0 0 4px 0 rgba(0, 0, 0, 0.1);

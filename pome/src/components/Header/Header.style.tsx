@@ -19,3 +19,22 @@ export const HeaderBox = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
+export const LeftBox = styled.div`
+  width: 39px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  left: 0;
+  svg {
+    position: relative;
+    top: 4px;
+  }
+`;
+export const RightBox = styled.div`
+  width: 39px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
