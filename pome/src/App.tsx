@@ -8,6 +8,7 @@ import HomePage from "./pages/HomePage";
 import DetailPage from "./pages/DetailPage";
 import RecommendPage from "./pages/RecommendPage";
 import MateRouter from "./pages/MateRouter";
+import MateDetailPage from "./pages/MateDetailPage";
 export default function App() {
   return (
     <>
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/home/detail/:category" element={<DetailPage />} />
         <Route path="/mate" element={<MateRouter />} />
+        <Route path="/mate/detail/:category" element={<MateDetailPage />} />
       </Routes>
     </>
   );

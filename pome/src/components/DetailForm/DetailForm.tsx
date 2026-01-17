@@ -8,7 +8,7 @@ import { DetailItem } from "../../types/detail";
 type DetailFormProps = {
   category: CategoryKey;
   value: DetailItem | null;
-  onChange: (v: DetailItem) => void;
+  onChange?: (v: DetailItem) => void;
   isEditing: boolean;
   isBase?: boolean;
   isSelectMode?: boolean;
@@ -40,7 +40,7 @@ export default function DetailForm({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value: inputValue } = e.target;
-    onChange({
+    onChange?.({
       ...safeValue,
       [name]: inputValue,
     });
@@ -56,7 +56,7 @@ export default function DetailForm({
     if (!file) return;
 
     setFileName(file.name);
-    onChange({
+    onChange?.({
       ...safeValue,
       [e.target.name]: file,
     });
@@ -71,7 +71,7 @@ export default function DetailForm({
       [name]: !prev[name],
     }));
 
-    onChange({
+    onChange?.({
       ...safeValue,
       [name]: currentlyDisabled ? "" : null,
     });
@@ -84,7 +84,7 @@ export default function DetailForm({
       : [];
     if (currentLinks.length >= 4) return;
 
-    onChange({
+    onChange?.({
       ...safeValue,
       content: [...currentLinks, ""],
     });
@@ -96,7 +96,7 @@ export default function DetailForm({
       : [];
     const next = [...currentLinks];
     next[index] = newValue;
-    onChange({ ...safeValue, content: next });
+    onChange?.({ ...safeValue, content: next });
   };
 
   const savedLinks = (safeValue.links ?? [])
@@ -196,7 +196,6 @@ export default function DetailForm({
                 safeValue[field.name] === null
               }
               disabledTone={
-                !isEditing ||
                 exprDisabled[field.name] ||
                 safeValue[field.name] === null
               }
@@ -220,7 +219,11 @@ export default function DetailForm({
                   </S.LinkIcon>
                   <S.LinkBox
                     value={link}
-                    onChange={(e) => handleLinkChange(index, e.target.value)}
+                    onChange={
+                      isEditing
+                        ? (e) => handleLinkChange(index, e.target.value)
+                        : undefined
+                    }
                     disabled={!isEditing}
                   />
                 </S.LinkContainer>

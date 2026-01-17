@@ -4,3 +4,4 @@ export { default as HomePage } from "./HomePage";
 export { default as DetailPage } from "./DetailPage";
 export { default as RecommendPage } from "./RecommendPage";
 export { default as MateHomePage } from "./MateHomePage";
+export { default as MateDetailPage } from "./MateDetailPage";

@@ -13,8 +13,9 @@ import { useNavigate } from "react-router-dom";
 
 interface MenuSectionProps {
   title: string;
-  category: CategoryKey;
+  category: CategoryKey[];
   items?: Record<string, any>[];
+  data: Record<CategoryKey, Record<string, any>[]>;
   basePath: "home" | "mate";
   isOwner?: boolean;
   isPublic: boolean;
@@ -49,6 +50,7 @@ const MenuSection = memo(
     title,
     items,
     category,
+    data,
     basePath,
     isOwner,
     isPublic,
@@ -71,7 +73,7 @@ const MenuSection = memo(
       );
     }
     const goToDetail = () => {
-      navigate(`/${basePath}/detail/${category}`);
+      navigate(`/${basePath}/detail/${category[0]}`);
     };
     return (
       <S.MenuContainer>
@@ -104,19 +106,29 @@ const MenuSection = memo(
             >
               <S.BorderLine />
               <S.Dropdown>
-                {category === "etc"
-                  ? items?.flatMap((item) =>
+                {category.map((category) => {
+                  const items = data[category];
+
+                  if (!items || items.length === 0) return null;
+
+                  // etc 전용 처리
+                  if (category === "etc") {
+                    return items.flatMap((item: Record<string, any>) =>
                       Array.isArray(item.content)
                         ? item.content.map((link: string) => (
-                            <S.DropBox key={link}>• {link}</S.DropBox>
+                            <S.DropBox key={`etc-${link}`}>• {link}</S.DropBox>
                           ))
                         : []
-                    )
-                  : items?.map((item) => (
-                      <S.DropBox key={item.id}>
-                        • {renderItem(item, category)}
-                      </S.DropBox>
-                    ))}
+                    );
+                  }
+
+                  // 일반 category
+                  return items.map((item: Record<string, any>) => (
+                    <S.DropBox key={`${category}-${item.id}`}>
+                      • {renderItem(item, category)}
+                    </S.DropBox>
+                  ));
+                })}
               </S.Dropdown>
             </motion.div>
           )}
@@ -131,16 +143,18 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
     <>
       <MenuSection
         title="학력/경력"
-        category="education"
+        category={["education", "experience"]}
+        data={data}
         items={data.education}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={false}
+        isPublic={true}
       />
 
       <MenuSection
         title="대·내외 활동"
-        category="activity"
+        category={["activity"]}
+        data={data}
         items={data.activity}
         basePath={basePath}
         isOwner={isOwner}
@@ -149,7 +163,8 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
 
       <MenuSection
         title="수상경력"
-        category="award"
+        category={["award"]}
+        data={data}
         items={data.award}
         basePath={basePath}
         isOwner={isOwner}
@@ -158,7 +173,8 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
 
       <MenuSection
         title="자격증"
-        category="certificate"
+        category={["certificate"]}
+        data={data}
         items={data.certificate}
         basePath={basePath}
         isOwner={isOwner}
@@ -167,7 +183,8 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
 
       <MenuSection
         title="프로젝트"
-        category="project"
+        category={["project"]}
+        data={data}
         items={data.project}
         basePath={basePath}
         isOwner={isOwner}
@@ -176,11 +193,12 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
 
       <MenuSection
         title="기타"
-        category="etc"
+        category={["etc"]}
+        data={data}
         items={data.etc}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={false}
+        isPublic={true}
       />
     </>
   );

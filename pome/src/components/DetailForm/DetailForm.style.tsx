@@ -21,7 +21,7 @@ export const FormName = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
-  margin: 0 16px;
+  margin: 0 10px;
 `;
 
 export const FormLabel = styled.div`
@@ -176,6 +176,7 @@ export const LinkBox = styled.input`
   flex: 1;
   height: 30px;
   color: #097795;
+  background-color: #ffffff;
   border-radius: 50px;
   leading-trim: both;
   text-edge: cap;
