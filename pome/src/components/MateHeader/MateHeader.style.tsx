@@ -8,9 +8,8 @@ export const Header = styled.div`
   border-radius: 0 0 30px 30px;
   background: #fff;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
-  position: sticky;
+  position: fixed;
   max-width: 430px;
-  top: 0;
 `;
 export const HeaderBox = styled.div`
   width: 100%;
@@ -20,11 +19,20 @@ export const HeaderBox = styled.div`
   justify-content: space-between;
   align-items: center;
 `;
-export const EmptyBox = styled.div`
-  width: 52px;
+export const ProfileBox = styled.div`
+  width: 39px;
+  height: 39px;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+  svg {
+    width: 100%;
+    height: 100%;
+  }
 `;
-export const IconBox = styled.div`
-  width: 52px;
-  display: inline-flex;
-  gap: 10px;
+export const AlarmBox = styled.div`
+  width: 39px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `;

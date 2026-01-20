@@ -5,11 +5,11 @@ export const DetailHeader = styled.div`
   justify-content: center;
   display: flex;
   align-items: center;
-  border-radius: 30px 30px 0 0;
+  border-radius: 0 0 30px 30px;
   background: #fff;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
-  transform: rotate(180deg);
   position: fixed;
+  max-width: 430px;
 `;
 export const DetailHeaderBox = styled.div`
   width: 100%;
@@ -18,7 +18,6 @@ export const DetailHeaderBox = styled.div`
   padding: 0 24px;
   justify-content: space-between;
   align-items: center;
-  transform: rotate(180deg);
 `;
 export const LeftBox = styled.div`
   display: flex;

@@ -10,7 +10,7 @@ export const PomeStyles = css`
     padding: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: #fff;
+    background-color: #d9d7d7;
   }
 
   button,
@@ -52,11 +52,10 @@ export const PomeStyles = css`
     flex-direction: column;
     width: 100%;
     min-width: 320px;
-    max-width: 768px;
+    max-width: 430px;
     min-height: 100vh;
     margin: 0 auto;
     background-color: white;
-    overflow-y: auto;
   }
   * {
     box-sizing: border-box;

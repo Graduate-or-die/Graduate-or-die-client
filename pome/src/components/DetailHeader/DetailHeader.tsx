@@ -8,9 +8,13 @@ import { CategoryKey } from "../../constants/categories";
 
 type DetailHeaderProps = {
   category: CategoryKey;
+  showDown?: boolean;
 };
 
-export default function DetailHeader({ category }: DetailHeaderProps) {
+export default function DetailHeader({
+  category,
+  showDown = true,
+}: DetailHeaderProps) {
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
@@ -29,7 +33,7 @@ export default function DetailHeader({ category }: DetailHeaderProps) {
             </button>
             {title}
           </S.LeftBox>
-          <Down />
+          {showDown && <Down />}
         </S.DetailHeaderBox>
       </S.DetailHeader>
     </>
