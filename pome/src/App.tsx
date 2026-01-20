@@ -9,6 +9,7 @@ import DetailPage from "./pages/DetailPage";
 import RecommendPage from "./pages/RecommendPage";
 import MateRouter from "./pages/MateRouter";
 import MateDetailPage from "./pages/MateDetailPage";
+import CommentPage from "./pages/CommentPage";
 export default function App() {
   return (
     <>
@@ -20,6 +21,11 @@ export default function App() {
         <Route path="/home/detail/:category" element={<DetailPage />} />
         <Route path="/mate" element={<MateRouter />} />
         <Route path="/mate/detail/:category" element={<MateDetailPage />} />
+        <Route path="/mate/detail/:category/:field" element={<CommentPage />} />
+        <Route
+          path="/mate/detail/:category/:id/:field"
+          element={<CommentPage />}
+        />
       </Routes>
     </>
   );

@@ -5,7 +5,7 @@ import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
 import { Link, Check, SelectCheck, Plus } from "../../icons";
 import { DetailItem } from "../../types/detail";
 
-type DetailFormProps = {
+export type DetailFormProps = {
   category: CategoryKey;
   value: DetailItem | null;
   onChange?: (v: DetailItem) => void;
@@ -14,6 +14,7 @@ type DetailFormProps = {
   isSelectMode?: boolean;
   isSelected?: boolean;
   onToggleSelect?: () => void;
+  onFieldClick?: (fieldName: string) => void;
 };
 
 export default function DetailForm({
@@ -25,6 +26,7 @@ export default function DetailForm({
   isSelectMode,
   isSelected,
   onToggleSelect,
+  onFieldClick,
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -136,14 +138,24 @@ export default function DetailForm({
               name="periodStart"
               value={(safeValue.periodStart as string) || ""}
               onChange={handleChange}
-              disabled={!isEditing}
+              readOnly={!isEditing}
+              onClick={() => {
+                if (!isEditing) {
+                  onFieldClick?.(field.name);
+                }
+              }}
             />
             <span>~</span>
             <S.DateBox
               name="periodEnd"
               value={(safeValue.periodEnd as string) || ""}
               onChange={handleChange}
-              disabled={!isEditing || exprDisabled[field.name]}
+              readOnly={!isEditing || exprDisabled[field.name]}
+              onClick={() => {
+                if (!isEditing) {
+                  onFieldClick?.(field.name);
+                }
+              }}
             />
           </S.PeriodBox>
         ) : field.kind === "textarea" ? (
@@ -151,7 +163,12 @@ export default function DetailForm({
             name={field.name}
             value={inputValue}
             onChange={handleChange}
-            disabled={!isEditing}
+            readOnly={!isEditing}
+            onClick={() => {
+              if (!isEditing) {
+                onFieldClick?.(field.name);
+              }
+            }}
           />
         ) : field.kind === "file" ? (
           <>
@@ -182,7 +199,7 @@ export default function DetailForm({
             name={field.name}
             value={inputValue}
             onChange={handleChange}
-            disabled={!isEditing}
+            readOnly={!isEditing}
           />
         ) : field.kind === "expr" ? (
           <>
@@ -190,15 +207,19 @@ export default function DetailForm({
               name={field.name}
               value={inputValue}
               onChange={handleChange}
-              disabled={
+              readOnly={
                 !isEditing ||
                 exprDisabled[field.name] ||
                 safeValue[field.name] === null
               }
               disabledTone={
-                exprDisabled[field.name] ||
-                safeValue[field.name] === null
+                exprDisabled[field.name] || safeValue[field.name] === null
               }
+              onClick={() => {
+                if (!isEditing) {
+                  onFieldClick?.(field.name);
+                }
+              }}
             />
             <S.CheckContainer onClick={() => toggleExpr(field.name)}>
               {safeValue[field.name] === null || exprDisabled[field.name] ? (
@@ -245,7 +266,12 @@ export default function DetailForm({
             value={inputValue}
             onChange={handleChange}
             gray={isEducation || field.group === "education"}
-            disabled={!isEditing}
+            readOnly={!isEditing}
+            onClick={() => {
+              if (!isEditing) {
+                onFieldClick?.(field.name);
+              }
+            }}
           />
         )}
       </S.FormRow>

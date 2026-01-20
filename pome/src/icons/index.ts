@@ -28,3 +28,8 @@ export { ReactComponent as Search } from "./Search.svg";
 export { ReactComponent as SlideLeft } from "./SlideLeft.svg";
 export { ReactComponent as SlideRight } from "./SlideRight.svg";
 export { ReactComponent as Lock } from "./Lock.svg";
+export { ReactComponent as Send } from "./Send.svg";
+export { ReactComponent as RedDot } from "./RedDot.svg";
+export { ReactComponent as Etc } from "./Etc.svg";
+export { ReactComponent as CommentDeleteSelect } from "./CommentDeleteSelect.svg";
+export { ReactComponent as CommentDeleteAll } from "./CommentDeleteAll.svg";
