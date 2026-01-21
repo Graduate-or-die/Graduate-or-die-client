@@ -3,9 +3,10 @@ import * as S from "./Input.style";
 import { Send } from "../../icons";
 type InputProps = {
   onSubmit: (value: string) => void;
+  placeholder?: string;
 };
 
-export default function Input({ onSubmit }: InputProps) {
+export default function Input({ onSubmit, placeholder }: InputProps) {
   const [value, setValue] = useState("");
   const handleSubmit = () => {
     if (!value.trim()) return;
@@ -18,7 +19,7 @@ export default function Input({ onSubmit }: InputProps) {
       <S.InputContainer>
         <S.InputRow>
           <S.InputBox
-            placeholder="댓글을 입력하세요."
+            placeholder={placeholder}
             value={value}
             onChange={(e) => setValue(e.target.value)}
             onKeyDown={(e) => {

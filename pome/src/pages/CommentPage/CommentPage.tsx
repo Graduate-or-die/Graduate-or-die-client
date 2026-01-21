@@ -149,7 +149,7 @@ export default function CommentPage() {
             <div ref={bottomRef} />
           </S.CommentContainer>
         </S.ContentWrapper>
-        <Input onSubmit={handleAddComment} />
+        <Input placeholder="댓글을 입력하세요." onSubmit={handleAddComment} />
       </S.PageWrapper>
     </>
   );

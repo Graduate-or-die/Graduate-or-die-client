@@ -1,0 +1,31 @@
+import styled from "@emotion/styled";
+export const PopContainer = styled.div<{ x: number; y: number }>`
+  width: 83px;
+  height: 40px;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-direction: column;
+  position: fixed;
+  top: ${({ y }) => y + 8}px;
+  left: ${({ x }) => x}px;
+  transform: translateX(-50%);
+`;
+export const PopBox = styled.div`
+  color: #555;
+  leading-trim: both;
+  text-edge: cap;
+  font-family: "Pretendard Variable";
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+`;
