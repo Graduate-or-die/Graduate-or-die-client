@@ -6,7 +6,7 @@ interface BadgeProps {
 export default function HomeBadge({ label }: BadgeProps) {
   return (
     <S.BadgeTag>
-      <S.BadgeText>#{label}</S.BadgeText>
+      <S.BadgeText>{label}</S.BadgeText>
     </S.BadgeTag>
   );
 }

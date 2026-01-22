@@ -27,8 +27,8 @@ export default function HomePage() {
                 <Star />
                 AI 기반 생성 태그
               </S.AiTagBox>
-              <HomeBadge label="대회마스터" />
-              <HomeBadge label="프론트엔드개발자" />
+              <HomeBadge label="#대회마스터" />
+              <HomeBadge label="#프론트엔드개발자" />
             </S.AiTagContainer>
           </S.CenterWrapper>
         </S.ContentWrapper>
