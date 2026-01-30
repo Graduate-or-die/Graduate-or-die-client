@@ -9,7 +9,8 @@ export const InputContainer = styled.div`
   border-radius: 30px 30px 0 0;
   background: #fff;
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
-  bottom: 0;
+  position: sticky;
+  bottom: env(safe-area-inset-bottom);
   z-index: 1000;
 `;
 export const InputRow = styled.div`

@@ -6,3 +6,4 @@ export { default as RecommendPage } from "./RecommendPage";
 export { default as MateHomePage } from "./MateHomePage";
 export { default as MateDetailPage } from "./MateDetailPage";
 export { default as CommentPage } from "./CommentPage";
+export { default as ChatPage } from "./ChatPage";

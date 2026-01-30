@@ -16,7 +16,7 @@ export const BadgeText = styled.span`
   leading-trim: both;
   text-edge: cap;
   font-family: "Pretendard Variable";
-  font-size: 15.522px;
+  font-size: 15px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;

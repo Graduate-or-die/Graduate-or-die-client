@@ -1,16 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import * as S from "./Input.style";
 import { Send } from "../../icons";
 type InputProps = {
+  value: string;
   onSubmit: (value: string) => void;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder?: string;
 };
 
-export default function Input({ onSubmit }: InputProps) {
-  const [value, setValue] = useState("");
+function Input(
+  { value, onSubmit, onChange, placeholder }: InputProps,
+  ref: React.Ref<HTMLInputElement>,
+) {
+  const inputRef = useRef<HTMLInputElement>(null);
   const handleSubmit = () => {
     if (!value.trim()) return;
     onSubmit(value);
-    setValue("");
+    inputRef.current?.focus();
   };
 
   return (
@@ -18,9 +24,10 @@ export default function Input({ onSubmit }: InputProps) {
       <S.InputContainer>
         <S.InputRow>
           <S.InputBox
-            placeholder="댓글을 입력하세요."
+            ref={ref}
+            placeholder={placeholder}
             value={value}
-            onChange={(e) => setValue(e.target.value)}
+            onChange={onChange}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 handleSubmit();
@@ -35,3 +42,4 @@ export default function Input({ onSubmit }: InputProps) {
     </>
   );
 }
+export default React.forwardRef<HTMLInputElement, InputProps>(Input);
