@@ -198,7 +198,7 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
         items={data.etc}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={false}
       />
     </>
   );

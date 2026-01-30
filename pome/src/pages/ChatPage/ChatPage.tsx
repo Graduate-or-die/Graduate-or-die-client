@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import * as S from "./ChatPage.style";
 import { Message } from "../../types/message";
 import ChatHeader from "../../components/ChatHeader";
 import SpeechBubbleList from "../../components/SpeechBubblesList";
 import SpeechBubbles from "../../components/SpeechBubbles";
 import Input from "../../components/Input";
+import AIquestion from "../../components/AIquestion";
 import TabBar from "../../components/TabBar";
 export default function ChatPage() {
   const initialMessages: Message[] = [
@@ -16,7 +17,7 @@ export default function ChatPage() {
       createdAt: "2026-01-20T09:00:00Z",
       isMine: true,
     },
-     {
+    {
       id: "2",
       roomId: "room1",
       senderId: "other",
@@ -74,34 +75,65 @@ export default function ChatPage() {
     },
   ];
   const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const [inputValue, setInputValue] = useState("");
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
+  const handleSelectQuestion = (text: string) => {
+    setInputValue(text);
+
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  };
 
   return (
     <>
-      <ChatHeader />
-      <S.ChatContainer>
-        <SpeechBubbleList
-          messages={messages}
-          onDelete={(id) =>
-            setMessages((prev) => prev.filter((m) => m.id !== id))
-          }
-        />
-      </S.ChatContainer>
-      <Input
-        placeholder="이야기를 시작해 보세요."
-        onSubmit={(content) => {
-          setMessages((prev) => [
-            ...prev,
-            {
-              id: Date.now().toString(),
-              roomId: "room1",
-              senderId: "me",
-              content,
-              createdAt: new Date().toISOString(),
-              isMine: true,
-            },
-          ]);
-        }}
-      />
+      <S.PageWrapper>
+        <ChatHeader />
+        <S.ContentArea>
+          <S.ChatContainer>
+            <SpeechBubbleList
+              messages={messages}
+              onDelete={(id) =>
+                setMessages((prev) => prev.filter((m) => m.id !== id))
+              }
+            />
+            <div ref={bottomRef} />
+          </S.ChatContainer>
+
+          <S.BottomArea>
+            <S.AIArea>
+              <AIquestion onSelectQuestion={handleSelectQuestion} />
+            </S.AIArea>
+            <Input
+              ref={inputRef}
+              value={inputValue}
+              placeholder="이야기를 시작해 보세요."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setInputValue(e.target.value)
+              }
+              onSubmit={(content) => {
+                setMessages((prev) => [
+                  ...prev,
+                  {
+                    id: Date.now().toString(),
+                    roomId: "room1",
+                    senderId: "me",
+                    content,
+                    createdAt: new Date().toISOString(),
+                    isMine: true,
+                  },
+                ]);
+                setInputValue("");
+              }}
+            />
+          </S.BottomArea>
+        </S.ContentArea>
+      </S.PageWrapper>
     </>
   );
 }
