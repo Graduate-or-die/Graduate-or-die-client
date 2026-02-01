@@ -6,7 +6,7 @@ export const Overlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 999;
+  z-index: 1001;
 `;
 
 export const NoticeContainer = styled.div`
