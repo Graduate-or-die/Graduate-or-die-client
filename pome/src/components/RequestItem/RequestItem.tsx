@@ -1,22 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
 import * as S from "./RequestItem.style";
 import { RequestProfile } from "../../assets";
-import { useNavigate } from "react-router-dom";
+import NoticePop from "../NoticePop";
 
 type RequestItemProps = {
   userId: number;
   nickname: string;
   job: string;
+  isMatched: boolean;
   onReject: (userId: number) => void;
+  onAccept: (profile: {
+    userId: number;
+    nickname: string;
+    isMatched: boolean;
+  }) => void;
 };
 
 export default function RequestItem({
   userId,
   nickname,
   job,
+  isMatched,
   onReject,
+  onAccept,
 }: RequestItemProps) {
-  const navigate = useNavigate();
   return (
     <>
       <S.RequestContainer>
@@ -29,7 +36,9 @@ export default function RequestItem({
         </S.ItemBox>
         <S.SelectBox>
           <S.RejectBox onClick={() => onReject(userId)}>거절</S.RejectBox>
-          <S.AllowBox onClick={() => navigate("/match")}>수락</S.AllowBox>
+          <S.AllowBox onClick={() => onAccept({ userId, nickname, isMatched })}>
+            수락
+          </S.AllowBox>
         </S.SelectBox>
       </S.RequestContainer>
     </>
