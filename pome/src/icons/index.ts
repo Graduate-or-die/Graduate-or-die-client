@@ -33,3 +33,5 @@ export { ReactComponent as RedDot } from "./RedDot.svg";
 export { ReactComponent as Etc } from "./Etc.svg";
 export { ReactComponent as CommentDeleteSelect } from "./CommentDeleteSelect.svg";
 export { ReactComponent as CommentDeleteAll } from "./CommentDeleteAll.svg";
+export { ReactComponent as PomeOn } from "./PomeOn.svg";
+export { ReactComponent as Close } from "./Close.svg";
