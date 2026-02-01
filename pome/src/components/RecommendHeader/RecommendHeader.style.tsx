@@ -11,6 +11,7 @@ export const Header = styled.div`
   position: sticky;
   max-width: 430px;
   top: 0;
+  z-index: 1000;
 `;
 export const HeaderBox = styled.div`
   width: 100%;

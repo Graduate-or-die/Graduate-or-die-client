@@ -38,7 +38,7 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     nickname: "이석민",
     introduction: "저 인턴 어쩌구 저쩌구",
     job: "프론트엔드 개발자",
-    isMatched: false,
+    isMatched: true,
     tags: ["프론트엔드개발자", "대기업러버"],
     aiSummary:
       "인턴 경험, 프론트엔드 담당 프로젝트 3개, 해커톤 수상 4개, 직무 관련 자격증 소지",

@@ -19,6 +19,7 @@ export default function CommentPage() {
   const [comments, setComments] = useState<
     { id: string; content: string; createdAt: string }[]
   >([]);
+  const [comment, setComment] = useState("");
 
   const [selectedCommentIds, setSelectedCommentIds] = useState<string[]>([]);
   const [isPopOpen, setIsPopOpen] = useState(false);
@@ -149,7 +150,12 @@ export default function CommentPage() {
             <div ref={bottomRef} />
           </S.CommentContainer>
         </S.ContentWrapper>
-        <Input placeholder="댓글을 입력하세요." onSubmit={handleAddComment} />
+        <Input
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="댓글을 입력하세요."
+          onSubmit={handleAddComment}
+        />
       </S.PageWrapper>
     </>
   );

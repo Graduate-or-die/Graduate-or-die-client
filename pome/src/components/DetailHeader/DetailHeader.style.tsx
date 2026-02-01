@@ -10,6 +10,7 @@ export const DetailHeader = styled.div`
   box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
   position: fixed;
   max-width: 430px;
+  z-index: 1000;
 `;
 export const DetailHeaderBox = styled.div`
   width: 100%;
