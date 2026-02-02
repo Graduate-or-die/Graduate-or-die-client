@@ -8,4 +8,5 @@ export { default as MateDetailPage } from "./MateDetailPage";
 export { default as CommentPage } from "./CommentPage";
 export { default as ChatPage } from "./ChatPage";
 export { default as RequestPage } from "./RequestPage";
-export { default as MateMatchPage } from "./MateMatchPage.svg";
+export { default as MateMatchPage } from "./MateMatchPage";
+export { default as MateInactivePage } from "./MateInactivePage";

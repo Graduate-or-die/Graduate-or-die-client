@@ -6,13 +6,13 @@ import MyPage from "./pages/MyPage";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import DetailPage from "./pages/DetailPage";
-import RecommendPage from "./pages/RecommendPage";
 import MateRouter from "./pages/MateRouter";
 import MateDetailPage from "./pages/MateDetailPage";
 import CommentPage from "./pages/CommentPage";
 import ChatPage from "./pages/ChatPage";
 import RequestPage from "./pages/RequestPage";
 import MateMatchPage from "./pages/MateMatchPage";
+import ChatRouter from "./pages/ChatRouter";
 export default function App() {
   return (
     <>
@@ -29,7 +29,7 @@ export default function App() {
           path="/mate/detail/:category/:id/:field"
           element={<CommentPage />}
         />
-        <Route path="/chat" element={<ChatPage />} />
+        <Route path="/chat" element={<ChatRouter />} />
         <Route path="/request" element={<RequestPage />} />
         <Route path="/match" element={<MateMatchPage />} />{" "}
       </Routes>
