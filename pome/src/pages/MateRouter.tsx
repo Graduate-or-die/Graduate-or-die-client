@@ -1,8 +1,11 @@
 import RecommendPage from "./RecommendPage";
 import MateHomePage from "./MateHomePage";
-
+import MateInactivePage from "./MateInactivePage";
 export default function MateRouter() {
-  const isMatched = false; // 개발을 위한 임시 코드
-
+  const isMateEnabled = false;
+  const isMatched = false;
+  if (!isMateEnabled) {
+    return <MateInactivePage variant="mate" />;
+  }
   return isMatched ? <MateHomePage /> : <RecommendPage />;
 }
