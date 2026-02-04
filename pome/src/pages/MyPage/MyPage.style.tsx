@@ -8,9 +8,27 @@ export const ProfileContainer = styled.div`
   margin-top: 100px;
 `;
 export const ProfileBox = styled.div`
-  display: flex;
+  width: 154px;
+  height: 154px;
   margin-top: 4px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eee;
+
+  cursor: pointer;
 `;
+export const ProfileImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
 export const ProfileFont = styled.span`
   color: #313334;
   text-align: center;
@@ -37,11 +55,12 @@ export const NameEditable = styled.input<{ isEditing: boolean }>`
 `;
 export const DetailContainer = styled.div`
   width: 100%;
-  height: 550px;
+  min-height: 450px;
   flex-shrink: 0;
   border-radius: 30px 30px 0 0;
   background: #fff;
   box-shadow: 0 0 20px 5px rgba(0, 0, 0, 0.1);
+  padding-bottom: 70px;
 `;
 export const TopBox = styled.div`
   display: flex;
@@ -66,7 +85,7 @@ export const EditBox = styled.div`
 `;
 export const InfoContainer = styled.div`
   padding: 6px;
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 `;
 export const InfoDetailContainer = styled.div`
   display: flex;
@@ -83,6 +102,7 @@ export const InfoBox1 = styled.span`
 `;
 export const InfoBox2 = styled.span`
   display: flex;
+  flex-wrap: wrap;
   color: #313334;
   font-family: "Pretendard Variable";
   font-size: 20px;
@@ -90,6 +110,8 @@ export const InfoBox2 = styled.span`
   font-weight: 500;
   line-height: normal;
   gap: 10px;
+  white-space: normal;
+  word-break: break-word;
 `;
 
 export const EditableInput = styled.input<{ isEditing: boolean }>`
@@ -103,4 +125,24 @@ export const EditableInput = styled.input<{ isEditing: boolean }>`
   color: ${({ isEditing }) => (isEditing ? "#000" : "#313334")};
   box-sizing: border-box;
   outline: none;
+`;
+export const EditableTextarea = styled.textarea<{ isEditing: boolean }>`
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  height: 1lh;
+  min-height: 1lh;
+  font-family: "Pretendard Variable";
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.4;
+  resize: none;
+  overflow: hidden;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: ${({ isEditing }) => (isEditing ? "#000" : "#313334")};
+  white-space: pre-wrap;
+  word-break: break-word;
+  pointer-events: ${({ isEditing }) => (isEditing ? "auto" : "none")};
 `;
