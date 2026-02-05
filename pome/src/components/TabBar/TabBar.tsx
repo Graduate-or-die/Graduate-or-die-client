@@ -45,7 +45,7 @@ const tabItems: {
     label: "MyPage",
     icon: <TabMyOff width={32} height={32} />,
     activeIcon: <TabMyOn width={32} height={32} />,
-    path: "/my",
+    path: "/mypage",
   },
 ];
 

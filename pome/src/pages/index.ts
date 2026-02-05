@@ -10,3 +10,4 @@ export { default as ChatPage } from "./ChatPage";
 export { default as RequestPage } from "./RequestPage";
 export { default as MateMatchPage } from "./MateMatchPage";
 export { default as MateInactivePage } from "./MateInactivePage";
+export { default as MatePage } from "./MatePage";
