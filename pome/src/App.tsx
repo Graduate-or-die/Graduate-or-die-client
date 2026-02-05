@@ -9,17 +9,17 @@ import DetailPage from "./pages/DetailPage";
 import MateRouter from "./pages/MateRouter";
 import MateDetailPage from "./pages/MateDetailPage";
 import CommentPage from "./pages/CommentPage";
-import ChatPage from "./pages/ChatPage";
 import RequestPage from "./pages/RequestPage";
 import MateMatchPage from "./pages/MateMatchPage";
 import ChatRouter from "./pages/ChatRouter";
+import MatePage from "./pages/MatePage";
 export default function App() {
   return (
     <>
       <Global styles={PomeStyles} />
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/my" element={<MyPage />} />
+        <Route path="/mypage" element={<MyPage />} />
         <Route path="/home" element={<HomePage />} />
         <Route path="/home/detail/:category" element={<DetailPage />} />
         <Route path="/mate" element={<MateRouter />} />
@@ -31,7 +31,8 @@ export default function App() {
         />
         <Route path="/chat" element={<ChatRouter />} />
         <Route path="/request" element={<RequestPage />} />
-        <Route path="/match" element={<MateMatchPage />} />{" "}
+        <Route path="/match" element={<MateMatchPage />} />
+        <Route path="/matepage" element={<MatePage />} />
       </Routes>
     </>
   );
