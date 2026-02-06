@@ -17,6 +17,7 @@ export type DetailFormProps = {
   onToggleSelect?: () => void;
   onFieldClick?: (fieldName: string) => void;
   commentedFields?: string[];
+   isMyPage?: boolean;
 };
 
 export default function DetailForm({
@@ -30,6 +31,7 @@ export default function DetailForm({
   onToggleSelect,
   onFieldClick,
   commentedFields,
+  isMyPage = false, 
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -134,7 +136,7 @@ export default function DetailForm({
         ? rawValue
         : undefined;
 
-    const showRedDot = hasComment(category, field.name, value.id);
+    const showRedDot = isMyPage && hasComment(category, field.name, value.id);
 
     
     return (
