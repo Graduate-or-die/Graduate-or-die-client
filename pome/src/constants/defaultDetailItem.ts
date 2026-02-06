@@ -1,5 +1,4 @@
 import { CategoryKey } from "./categories";
-import { v4 as uuid } from "uuid";
 import { DetailItem } from "../types/detail";
 
 // 화면 확인용 디폴트 데이터
@@ -9,7 +8,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 > = {
   education: [
     {
-      id: uuid(),
+      id: 1,
       school: "숙명여자대학교",
       major: "데이터사이언스",
       degree: "학사",
@@ -17,7 +16,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
   ],
   experience: [
     {
-      id: uuid(),
+      id: 1,
       place: "구글",
       state: "사장",
       periodStart: "2026-03",
@@ -27,14 +26,14 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 
   activity: [
     {
-      id: uuid(),
+      id: 1,
       name: "프론트엔드 스터디",
       role: "팀원",
       period: "2024.03 ~ 2024.06",
       result: "React 프로젝트 3회 진행",
     },
     {
-      id: uuid(),
+      id: 2,
       name: "ai 스터디",
       role: "팀장",
       period: "2025.03 ~ 2025.06",
@@ -44,7 +43,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 
   award: [
     {
-      id: uuid(),
+      id: 1,
       title: "해커톤",
       organization: "숙명여대",
       date: "2023-11-10",
@@ -52,7 +51,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
       file: null,
     },
     {
-      id: uuid(),
+      id: 2,
       title: "많이먹기대회",
       organization: "졸못죽",
       date: "2023-11-10",
@@ -63,7 +62,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 
   certificate: [
     {
-      id: uuid(),
+      id: 1,
       name: "정보처리기사",
       issuer: "한국산업인력공단",
       date: "2023-06-01",
@@ -72,7 +71,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
       file: null,
     },
     {
-      id: uuid(),
+      id: 2,
       name: "sqld",
       issuer: "한국데이터산업",
       date: "2024-06-01",
@@ -84,7 +83,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 
   project: [
     {
-      id: uuid(),
+      id: 1,
       name: "포트폴리오관리 서비스",
       periodStart: "2025-07",
       periodEnd: "2026-02",
@@ -96,7 +95,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 
   etc: [
     {
-      id: uuid(),
+      id: 1,
       content: ["https://github.com/username", "https://instagram/username"],
       memo: "포트폴리오 링크",
     },
@@ -106,7 +105,7 @@ export const DETAIL_DEFAULT_BY_CATEGORY: Record<
 export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
   education: [
     {
-      id: uuid(),
+      id: 1,
       school: "숙명여자대학교(메이트)",
       major: "데이터사이언스",
       degree: "학사",
@@ -114,7 +113,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
   ],
   experience: [
     {
-      id: uuid(),
+      id: 1,
       place: "네이버(메이트)",
       state: "인턴",
       periodStart: "2026-03",
@@ -124,7 +123,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
 
   activity: [
     {
-      id: uuid(),
+      id: 1,
       name: "프론트엔드 스터디(메이트)",
       role: "팀원",
       period: "2024.03 ~ 2024.06",
@@ -134,7 +133,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
 
   award: [
     {
-      id: uuid(),
+      id: 1,
       title: "해커톤(메이트)",
       organization: "숙명여대",
       date: "2023-11-10",
@@ -142,7 +141,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
       file: null,
     },
     {
-      id: uuid(),
+      id: 2,
       title: "많이먹기대회(메이트)",
       organization: "졸못죽",
       date: "2023-11-10",
@@ -150,7 +149,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
       file: null,
     },
     {
-      id: uuid(),
+      id: 3,
       title: "많이먹기대회(메이트)",
       organization: "졸못죽",
       date: "2023-11-10",
@@ -161,7 +160,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
 
   certificate: [
     {
-      id: uuid(),
+      id: 1,
       name: "정보처리기사(메이트)",
       issuer: "한국산업인력공단",
       date: "2023-06-01",
@@ -170,7 +169,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
       file: null,
     },
     {
-      id: uuid(),
+      id: 2,
       name: "sqld(메이트)",
       issuer: "한국데이터산업",
       date: "2024-06-01",
@@ -182,7 +181,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
 
   project: [
     {
-      id: uuid(),
+      id: 1,
       name: "포트폴리오관리 서비스(메이트)",
       periodStart: "2025-07",
       periodEnd: "2026-02",
@@ -194,7 +193,7 @@ export const DETAIL_DEFAULT_MATE_CATEGORY: Record<CategoryKey, DetailItem[]> = {
 
   etc: [
     {
-      id: uuid(),
+      id: 1,
       content: [
         "https://github.com/username(메이트)",
         "https://instagram/username(메이트)",

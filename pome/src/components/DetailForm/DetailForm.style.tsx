@@ -33,6 +33,7 @@ export const FormLabel = styled.div`
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  display: flex;
 `;
 
 export const FormBox = styled.input<{ gray?: boolean; disabledTone?: boolean }>`
@@ -231,4 +232,7 @@ export const SelectCircle = styled.div`
     width: 100%;
     height: 100%;
   }
+`;
+export const RedDotBox = styled.div`
+  display: flex;
 `;

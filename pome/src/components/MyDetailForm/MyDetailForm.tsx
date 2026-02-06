@@ -2,11 +2,18 @@ import React from "react";
 import DetailForm, { DetailFormProps } from "../DetailForm/DetailForm";
 import { useNavigate } from "react-router-dom";
 import { CategoryKey } from "../../constants/categories";
-type MateDetailFormProps = Omit<DetailFormProps, "onChange">;
+import { CATEGORY_FIELDS } from "../../constants/categoryFields";
+import { hasComment } from "../../constants/comments";
 
-export default function MateDetailForm(props: MateDetailFormProps) {
+type MyDetailFormProps = Omit<DetailFormProps, "onChange">;
+export default function MyDetailForm(props: MyDetailFormProps) {
   const { category, value, isEditing, ...rest } = props;
   const navigate = useNavigate();
+
+  const fields = CATEGORY_FIELDS[category];
+  const commentedFields = fields
+    .filter((f) => hasComment(category, f.name, value?.id))
+    .map((f) => f.name);
 
   const SINGLE_CATEGORIES: CategoryKey[] = ["education", "etc"];
 
@@ -14,9 +21,9 @@ export default function MateDetailForm(props: MateDetailFormProps) {
     if (!value) return;
 
     if (SINGLE_CATEGORIES.includes(category)) {
-      navigate(`/mate/detail/${category}/${fieldName}`);
+      navigate(`/my/detail/${category}/${fieldName}`);
     } else {
-      navigate(`/mate/detail/${category}/${value.id}/${fieldName}`);
+      navigate(`/my/detail/${category}/${value.id}/${fieldName}`);
     }
   };
 
@@ -27,6 +34,7 @@ export default function MateDetailForm(props: MateDetailFormProps) {
       onChange={() => {}}
       {...rest}
       onFieldClick={handleFieldClick}
+      commentedFields={commentedFields}
     />
   );
 }

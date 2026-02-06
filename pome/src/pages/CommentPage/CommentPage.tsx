@@ -6,7 +6,6 @@ import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS } from "../../constants/categoryFields";
 import { DETAIL_DEFAULT_MATE_CATEGORY } from "../../constants/defaultDetailItem";
-import { v4 as uuid } from "uuid";
 import Input from "../../components/Input";
 import { Etc } from "../../icons";
 import CommentPop from "../../components/CommentPop";
@@ -17,11 +16,11 @@ export default function CommentPage() {
     field: string;
   }>();
   const [comments, setComments] = useState<
-    { id: string; content: string; createdAt: string }[]
+    { id: number; content: string; createdAt: string }[]
   >([]);
   const [comment, setComment] = useState("");
 
-  const [selectedCommentIds, setSelectedCommentIds] = useState<string[]>([]);
+  const [selectedCommentIds, setSelectedCommentIds] = useState<number[]>([]);
   const [isPopOpen, setIsPopOpen] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
 
@@ -37,7 +36,7 @@ export default function CommentPage() {
   if (!safeCategory) return null;
 
   const items = DETAIL_DEFAULT_MATE_CATEGORY[safeCategory] ?? [];
-  const targetItem = items.find((item) => item.id === id) ?? items[0];
+  const targetItem = items.find((item) => item.id === Number(id)) ?? items[0];
 
   if (!targetItem) return null;
 
@@ -71,7 +70,7 @@ export default function CommentPage() {
     setComments((prev) => [
       ...prev,
       {
-        id: uuid(),
+        id: Date.now(),
         content,
         createdAt: new Date().toISOString(),
       },

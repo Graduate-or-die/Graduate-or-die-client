@@ -8,7 +8,6 @@ import { CategoryKey } from "../../constants/categories";
 import TabBar from "../../components/TabBar";
 import { DETAIL_DEFAULT_BY_CATEGORY } from "../../constants/defaultDetailItem";
 import { DetailItem } from "../../types/detail";
-import { v4 as uuid } from "uuid";
 
 export default function DetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
@@ -18,10 +17,10 @@ export default function DetailPage() {
 
   const [isEditing] = useState(true);
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [education, setEducation] = useState<DetailItem>({
     ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-    id: uuid(),
+    id: 1,
   });
   const [experiences, setExperiences] = useState<DetailItem[]>([]);
   const [items, setItems] = useState<DetailItem[]>([]);
@@ -31,22 +30,22 @@ export default function DetailPage() {
       case "education":
         setEducation({
           ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-          id: uuid(),
+          id: 1,
         });
         setExperiences(
-          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e) => ({
+          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e, idx) => ({
             ...e,
-            id: uuid(),
-          }))
+            id: idx + 1,
+          })),
         );
         break;
 
       case "etc":
         setItems(
-          DETAIL_DEFAULT_BY_CATEGORY.etc.map((e) => ({
+          DETAIL_DEFAULT_BY_CATEGORY.etc.map((e, idx) => ({
             ...e,
-            id: uuid(),
-          }))
+            id: idx + 1,
+          })),
         );
 
         break;
@@ -54,13 +53,13 @@ export default function DetailPage() {
       default:
         const defaultData = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
         if (Array.isArray(defaultData)) {
-          setItems(defaultData.map((e) => ({ ...e, id: uuid() })));
+          setItems(defaultData.map((e, idx) => ({ ...e, id: idx + 1 })));
         }
         break;
     }
   }, [safeCategory]);
 
-  const handleItemChange = (id: string, value: DetailItem) => {
+  const handleItemChange = (id: number, value: DetailItem) => {
     setItems((prev) => prev.map((item) => (item.id === id ? value : item)));
   };
 
@@ -68,20 +67,20 @@ export default function DetailPage() {
     setEducation(value);
   };
 
-  const handleExperienceChange = (id: string, value: DetailItem) => {
+  const handleExperienceChange = (id: number, value: DetailItem) => {
     setExperiences((prev) =>
-      prev.map((item) => (item.id === id ? value : item))
+      prev.map((item) => (item.id === id ? value : item)),
     );
   };
   const handleAdd = () => {
     if (safeCategory === "education") {
-      setExperiences((prev) => [...prev, { id: uuid() }]);
+      setExperiences((prev) => [...prev, { id: prev.length + 1 }]);
     } else {
-      setItems((prev) => [...prev, { id: uuid() }]);
+      setItems((prev) => [...prev, { id: prev.length + 1 }]);
     }
   };
 
-  const removeItem = (id: string) => {
+  const removeItem = (id: number) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
@@ -90,9 +89,9 @@ export default function DetailPage() {
     setSelectedIds([]);
   };
 
-  const toggleSelect = (id: string) => {
+  const toggleSelect = (id: number) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
     );
   };
 
@@ -104,7 +103,7 @@ export default function DetailPage() {
 
     if (safeCategory === "education") {
       setExperiences((prev) =>
-        prev.filter((item) => !selectedIds.includes(item.id))
+        prev.filter((item) => !selectedIds.includes(item.id)),
       );
     } else {
       setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));

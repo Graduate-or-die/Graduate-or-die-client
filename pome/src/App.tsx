@@ -2,17 +2,21 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import { Global, css } from "@emotion/react";
 import { PomeStyles } from "./styles/PomeStyles.style";
-import MyPage from "./pages/MyPage";
-import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
-import DetailPage from "./pages/DetailPage";
 import MateRouter from "./pages/MateRouter";
-import MateDetailPage from "./pages/MateDetailPage";
-import CommentPage from "./pages/CommentPage";
-import RequestPage from "./pages/RequestPage";
-import MateMatchPage from "./pages/MateMatchPage";
 import ChatRouter from "./pages/ChatRouter";
-import MatePage from "./pages/MatePage";
+import {
+  MyPage,
+  LoginPage,
+  HomePage,
+  DetailPage,
+  MateDetailPage,
+  CommentPage,
+  RequestPage,
+  MateMatchPage,
+  MatePage,
+  MyDetailPage,
+  MyCommentPage,
+} from "./pages/index";
 export default function App() {
   return (
     <>
@@ -33,6 +37,12 @@ export default function App() {
         <Route path="/request" element={<RequestPage />} />
         <Route path="/match" element={<MateMatchPage />} />
         <Route path="/matepage" element={<MatePage />} />
+        <Route path="/my/detail/:category" element={<MyDetailPage />} />
+        <Route path="/my/detail/:category/:field" element={<MyCommentPage />} />
+        <Route
+          path="/my/detail/:category/:id/:field"
+          element={<MyCommentPage />}
+        />
       </Routes>
     </>
   );
