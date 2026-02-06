@@ -16,17 +16,19 @@ export const BadgeContainer = styled.div`
   display: flex;
   gap: 10px;
 `;
-export const TabBadge = styled.div`
+export const TabBadge = styled.div<{ $active?: boolean }>`
   width: 88px;
   height: 28px;
   border-radius: 25.672px;
-  background: rgba(178, 232, 255, 0.5);
+  background: ${({ $active }) =>
+    $active ? "rgba(178, 232, 255, 0.5) " : "#eee"};
   justify-content: center;
   align-items: center;
   display: inline-flex;
+  cursor: pointer;
 `;
-export const BadgeText = styled.span`
-  color: #006f8e;
+export const BadgeText = styled.span<{ $active?: boolean }>`
+  color: ${({ $active }) => ($active ? "#006f8e" : "#000")};
   leading-trim: both;
   text-edge: cap;
   font-family: "Pretendard Variable";

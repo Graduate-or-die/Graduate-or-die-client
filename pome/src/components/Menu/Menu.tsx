@@ -16,13 +16,13 @@ interface MenuSectionProps {
   category: CategoryKey[];
   items?: Record<string, any>[];
   data: Record<CategoryKey, Record<string, any>[]>;
-  basePath: "home" | "mate";
+  basePath: "home" | "mate" |"my";
   isOwner?: boolean;
   isPublic: boolean;
 }
 interface MenuProps {
   data: Record<CategoryKey, Record<string, any>[]>;
-  basePath: "home" | "mate";
+  basePath: "home" | "mate" | "my";
   isOwner: boolean;
 }
 const MENU_DISPLAY_FIELDS: Partial<
@@ -84,7 +84,7 @@ const MenuSection = memo(
             </S.ToggleBox>
             <span onClick={goToDetail}>{title}</span>
           </S.MenuTitleBox>
-          {isOwner && (
+          {isOwner && basePath !== "my" &&(
             <S.SwitchBox
               onClick={(e) => {
                 e.stopPropagation();
