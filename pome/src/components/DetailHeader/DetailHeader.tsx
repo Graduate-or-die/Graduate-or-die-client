@@ -1,7 +1,7 @@
 import React from "react";
 import * as S from "./DetailHeader.style";
 import { Down, ArrowLeft } from "../../icons";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import { CATEGORIES } from "../../constants/categories";
 import { CategoryKey } from "../../constants/categories";
@@ -16,7 +16,24 @@ export default function DetailHeader({
   showDown = true,
 }: DetailHeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const goBack = () => {
+    if (location.state?.from === "mate") {
+      navigate("/mate", {
+        state: { backTab: "mate" },
+        replace: true,
+      });
+      return;
+    }
+
+    if (location.state?.from === "my") {
+      navigate("/mate", {
+        state: { backTab: "my" },
+        replace: true,
+      });
+      return;
+    }
+
     navigate(-1);
   };
   const title =

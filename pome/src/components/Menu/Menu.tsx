@@ -16,7 +16,7 @@ interface MenuSectionProps {
   category: CategoryKey[];
   items?: Record<string, any>[];
   data: Record<CategoryKey, Record<string, any>[]>;
-  basePath: "home" | "mate" |"my";
+  basePath: "home" | "mate" | "my";
   isOwner?: boolean;
   isPublic: boolean;
 }
@@ -73,7 +73,11 @@ const MenuSection = memo(
       );
     }
     const goToDetail = () => {
-      navigate(`/${basePath}/detail/${category[0]}`);
+      navigate(`/${basePath}/detail/${category[0]}`, {
+        state: {
+          from: basePath,
+        },
+      });
     };
     return (
       <S.MenuContainer>
@@ -84,7 +88,7 @@ const MenuSection = memo(
             </S.ToggleBox>
             <span onClick={goToDetail}>{title}</span>
           </S.MenuTitleBox>
-          {isOwner && basePath !== "my" &&(
+          {isOwner && basePath !== "my" && (
             <S.SwitchBox
               onClick={(e) => {
                 e.stopPropagation();
@@ -118,7 +122,7 @@ const MenuSection = memo(
                         ? item.content.map((link: string) => (
                             <S.DropBox key={`etc-${link}`}>• {link}</S.DropBox>
                           ))
-                        : []
+                        : [],
                     );
                   }
 
@@ -135,7 +139,7 @@ const MenuSection = memo(
         </AnimatePresence>
       </S.MenuContainer>
     );
-  }
+  },
 );
 
 export default function Menu({ data, basePath, isOwner }: MenuProps) {

@@ -52,10 +52,16 @@ const tabItems: {
 export default function TabBar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const pathname = location.pathname;
 
-  const activeTab =
-    tabItems.find((tab) => location.pathname.startsWith(tab.path))?.key ||
-    "home";
+  const activeTab: Tab = (() => {
+    if (pathname.startsWith("/my/detail")) return "mate";
+    if (pathname.startsWith("/mate")) return "mate";
+    if (pathname.startsWith("/home")) return "home";
+    if (pathname.startsWith("/chat")) return "chat";
+    if (pathname.startsWith("/mypage")) return "my";
+    return "home";
+  })();
 
   const handleClick = (tab: (typeof tabItems)[number]) => {
     if (tab.path !== location.pathname) {
