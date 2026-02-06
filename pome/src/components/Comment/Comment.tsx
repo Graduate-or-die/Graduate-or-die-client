@@ -11,23 +11,25 @@ type Comment = {
 };
 type CommentProps = {
   content: string;
-  checked: boolean;
-  isDeleteMode: boolean;
-  onToggle: () => void;
+  checked?: boolean;
+  isDeleteMode?: boolean;
+  onToggle?: () => void;
+  readonly?: boolean;
 };
 
 export default function Comment({
   content,
-  checked,
-  isDeleteMode,
+  checked = false,
+  isDeleteMode = false,
   onToggle,
+  readonly = false,
 }: CommentProps) {
   return (
     <>
       <S.CommentContainer
-        onClick={onToggle}
-        $checked={checked}
-        $deleteMode={isDeleteMode}
+        onClick={readonly ? undefined : onToggle}
+        $checked={!readonly && checked}
+        $deleteMode={!readonly && isDeleteMode}
       >
         <S.CommentRow>
           <S.ProfileBox>

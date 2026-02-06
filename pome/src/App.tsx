@@ -15,6 +15,7 @@ import {
   MateMatchPage,
   MatePage,
   MyDetailPage,
+  MyCommentPage,
 } from "./pages/index";
 export default function App() {
   return (
@@ -37,6 +38,11 @@ export default function App() {
         <Route path="/match" element={<MateMatchPage />} />
         <Route path="/matepage" element={<MatePage />} />
         <Route path="/my/detail/:category" element={<MyDetailPage />} />
+        <Route path="/my/detail/:category/:field" element={<MyCommentPage />} />
+        <Route
+          path="/my/detail/:category/:id/:field"
+          element={<MyCommentPage />}
+        />
       </Routes>
     </>
   );

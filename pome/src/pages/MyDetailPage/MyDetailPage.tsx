@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./MyDetailPage.style";
-import DetailForm from "../../components/DetailForm";
+import MyDetailForm from "../../components/MyDetailForm";
 import DetailHeader from "../../components/DetailHeader";
 import TabBar from "../../components/TabBar";
 import { CategoryKey } from "../../constants/categories";
 import { DETAIL_DEFAULT_BY_CATEGORY } from "../../constants/defaultDetailItem";
 import { DetailItem } from "../../types/detail";
-import { v4 as uuid } from "uuid";
 
 export default function MyDetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
@@ -24,12 +23,12 @@ export default function MyDetailPage() {
       case "education":
         setEducation({
           ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-          id: uuid(),
+          id: 1,
         });
         setExperiences(
-          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e) => ({
+          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e, idx) => ({
             ...e,
-            id: uuid(),
+            id: idx + 1,
           })),
         );
         break;
@@ -37,7 +36,7 @@ export default function MyDetailPage() {
       default:
         const data = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
         if (Array.isArray(data)) {
-          setItems(data.map((e) => ({ ...e, id: uuid() })));
+          setItems(data.map((e,idx) => ({ ...e, id: idx + 1 })));
         }
         break;
     }
@@ -56,14 +55,14 @@ export default function MyDetailPage() {
       <S.FormContainer>
         {safeCategory === "education" && education && (
           <>
-            <DetailForm
+            <MyDetailForm
               category="education"
               value={education}
               isEditing={false}
             />
 
             {experiences.map((item) => (
-              <DetailForm
+              <MyDetailForm
                 key={item.id}
                 category="experience"
                 value={item}
@@ -74,7 +73,7 @@ export default function MyDetailPage() {
         )}
         {safeCategory !== "education" &&
           items.map((item) => (
-            <DetailForm
+            <MyDetailForm
               key={item.id}
               category={safeCategory}
               value={item}

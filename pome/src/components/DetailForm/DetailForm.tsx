@@ -2,8 +2,9 @@ import React, { useRef, useState } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus } from "../../icons";
+import { Link, Check, SelectCheck, Plus, RedDot } from "../../icons";
 import { DetailItem } from "../../types/detail";
+import { hasComment } from "../../constants/comments";
 
 export type DetailFormProps = {
   category: CategoryKey;
@@ -15,6 +16,7 @@ export type DetailFormProps = {
   isSelected?: boolean;
   onToggleSelect?: () => void;
   onFieldClick?: (fieldName: string) => void;
+  commentedFields?: string[];
 };
 
 export default function DetailForm({
@@ -27,6 +29,7 @@ export default function DetailForm({
   isSelected,
   onToggleSelect,
   onFieldClick,
+  commentedFields,
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -35,11 +38,12 @@ export default function DetailForm({
   const [fileName, setFileName] = useState("");
   const [exprDisabled, setExprDisabled] = useState<Record<string, boolean>>({});
 
-  const safeValue: DetailItem = value ?? { id: "temp-id", links: [] };
+  if (!value) return null;
+  const safeValue = value;
   const links = Array.isArray(safeValue.content) ? safeValue.content : [];
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value: inputValue } = e.target;
     onChange?.({
@@ -85,9 +89,9 @@ export default function DetailForm({
       ? safeValue.content
       : [];
     if (currentLinks.length >= 4) return;
-
+    const { comments, ...rest } = safeValue;
     onChange?.({
-      ...safeValue,
+      ...rest,
       content: [...currentLinks, ""],
     });
   };
@@ -98,7 +102,8 @@ export default function DetailForm({
       : [];
     const next = [...currentLinks];
     next[index] = newValue;
-    onChange?.({ ...safeValue, content: next });
+    const { comments, ...rest } = safeValue;
+    onChange?.({ ...rest, content: next });
   };
 
   const savedLinks = (safeValue.links ?? [])
@@ -128,9 +133,20 @@ export default function DetailForm({
       Array.isArray(rawValue)
         ? rawValue
         : undefined;
+
+    const showRedDot = hasComment(category, field.name, value.id);
+
+    
     return (
       <S.FormRow key={field.name}>
-        <S.FormLabel>{field.label}</S.FormLabel>
+        <S.FormLabel>
+          {field.label}
+          {showRedDot && (
+            <S.RedDotBox>
+              <RedDot />
+            </S.RedDotBox>
+          )}
+        </S.FormLabel>
 
         {field.kind === "period" ? (
           <S.PeriodBox>
