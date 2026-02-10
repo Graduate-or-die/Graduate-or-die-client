@@ -36,3 +36,4 @@ export { ReactComponent as CommentDeleteAll } from "./CommentDeleteAll.svg";
 export { ReactComponent as PomeOn } from "./PomeOn.svg";
 export { ReactComponent as PomeOff } from "./PomeOff.svg";
 export { ReactComponent as Close } from "./Close.svg";
+export { ReactComponent as Delete } from "./Delete.svg";
