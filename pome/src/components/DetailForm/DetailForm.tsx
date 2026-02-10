@@ -18,6 +18,7 @@ export type DetailFormProps = {
   onFieldClick?: (fieldName: string) => void;
   commentedFields?: string[];
   isMyPage?: boolean;
+  showAttachButton?: boolean;
 };
 
 export default function DetailForm({
@@ -32,6 +33,7 @@ export default function DetailForm({
   onFieldClick,
   commentedFields,
   isMyPage = false,
+  showAttachButton = true,
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -216,17 +218,19 @@ export default function DetailForm({
                 readOnly
               />
               {fileName && (
-                <S.DeleteBox  onClick={handleFileDelete}>
+                <S.DeleteBox onClick={handleFileDelete}>
                   <Delete />
                 </S.DeleteBox>
               )}
-              <S.AttachButton
-                type="button"
-                onClick={handleFileClick}
-                disabled={!isEditing}
-              >
-                첨부
-              </S.AttachButton>
+              {showAttachButton && (
+                <S.AttachButton
+                  type="button"
+                  onClick={handleFileClick}
+                  disabled={!isEditing}
+                >
+                  첨부
+                </S.AttachButton>
+              )}
             </S.FileContainer>
           </>
         ) : field.kind === "memo" ? (
