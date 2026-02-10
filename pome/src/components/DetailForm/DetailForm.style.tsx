@@ -134,9 +134,10 @@ export const DateBox = styled.input`
   text-align: center;
 `;
 export const FileContainer = styled.div`
-  width: 100%;
+  width: 325px;
   display: flex;
   align-items: center;
+  gap: 4px;
 `;
 export const FileBox = styled.input`
   display: none;
@@ -155,7 +156,7 @@ export const FileNameBox = styled.input`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 0 10px;
+  padding: 0 10px 0 5px;
 `;
 
 export const LinkContainer = styled.div`
@@ -235,4 +236,16 @@ export const SelectCircle = styled.div`
 `;
 export const RedDotBox = styled.div`
   display: flex;
+`;
+export const DeleteBox = styled.div`
+  margin-left: -20px;
+  margin-right: 6px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
 `;

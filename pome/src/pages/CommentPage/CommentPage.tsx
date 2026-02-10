@@ -84,7 +84,7 @@ export default function CommentPage() {
   return (
     <>
       <S.PageWrapper>
-        <DetailHeader category={safeCategory} showDown={false} />
+        <DetailHeader category={safeCategory} />
         <S.ContentWrapper>
           <S.FormContainer>
             <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>

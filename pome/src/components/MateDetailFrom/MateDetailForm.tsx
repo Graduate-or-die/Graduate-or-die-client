@@ -27,6 +27,7 @@ export default function MateDetailForm(props: MateDetailFormProps) {
       onChange={() => {}}
       {...rest}
       onFieldClick={handleFieldClick}
+      showAttachButton={false}
     />
   );
 }

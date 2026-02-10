@@ -36,6 +36,7 @@ export default function MyDetailForm(props: MyDetailFormProps) {
       onFieldClick={handleFieldClick}
       commentedFields={commentedFields}
       isMyPage={true}
+      showAttachButton={false}
     />
   );
 }

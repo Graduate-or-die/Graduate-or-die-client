@@ -61,7 +61,7 @@ export default function MyCommentPage() {
   return (
     <>
       <S.PageWrapper>
-        <DetailHeader category={safeCategory} showDown={false} />
+        <DetailHeader category={safeCategory} />
 
         <S.ContentWrapper>
           <S.FormContainer>

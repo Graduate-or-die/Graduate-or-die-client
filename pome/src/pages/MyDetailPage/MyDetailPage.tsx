@@ -51,7 +51,7 @@ export default function MyDetailPage() {
   };
   return (
     <>
-      <DetailHeader category={safeCategory} showDown={false} />
+      <DetailHeader category={safeCategory} />
       <S.FormContainer>
         {safeCategory === "education" && education && (
           <>

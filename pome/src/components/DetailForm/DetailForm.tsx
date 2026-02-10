@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus, RedDot } from "../../icons";
+import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
 import { DetailItem } from "../../types/detail";
 import { hasComment } from "../../constants/comments";
 
@@ -17,7 +17,8 @@ export type DetailFormProps = {
   onToggleSelect?: () => void;
   onFieldClick?: (fieldName: string) => void;
   commentedFields?: string[];
-   isMyPage?: boolean;
+  isMyPage?: boolean;
+  showAttachButton?: boolean;
 };
 
 export default function DetailForm({
@@ -31,7 +32,8 @@ export default function DetailForm({
   onToggleSelect,
   onFieldClick,
   commentedFields,
-  isMyPage = false, 
+  isMyPage = false,
+  showAttachButton = true,
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -138,7 +140,19 @@ export default function DetailForm({
 
     const showRedDot = isMyPage && hasComment(category, field.name, value.id);
 
-    
+    const handleFileDelete = () => {
+      setFileName("");
+
+      if (fileRef.current) {
+        fileRef.current.value = "";
+      }
+
+      onChange?.({
+        ...safeValue,
+        [field.name]: null,
+      });
+    };
+
     return (
       <S.FormRow key={field.name}>
         <S.FormLabel>
@@ -203,13 +217,20 @@ export default function DetailForm({
                 placeholder="파일을 첨부하세요"
                 readOnly
               />
-              <S.AttachButton
-                type="button"
-                onClick={handleFileClick}
-                disabled={!isEditing}
-              >
-                첨부
-              </S.AttachButton>
+              {fileName && (
+                <S.DeleteBox onClick={handleFileDelete}>
+                  <Delete />
+                </S.DeleteBox>
+              )}
+              {showAttachButton && (
+                <S.AttachButton
+                  type="button"
+                  onClick={handleFileClick}
+                  disabled={!isEditing}
+                >
+                  첨부
+                </S.AttachButton>
+              )}
             </S.FileContainer>
           </>
         ) : field.kind === "memo" ? (

@@ -15,7 +15,7 @@ export default function MateDetailPage() {
   const items = DETAIL_DEFAULT_MATE_CATEGORY[safeCategory];
   return (
     <>
-      <DetailHeader category={safeCategory} showDown={false} />
+      <DetailHeader category={safeCategory} />
       <S.ContentWrapper>
         <S.FormContainer>
           {safeCategory === "education" || safeCategory === "experience" ? (
