@@ -8,12 +8,10 @@ import { CategoryKey } from "../../constants/categories";
 
 type DetailHeaderProps = {
   category: CategoryKey;
-  showDown?: boolean;
 };
 
 export default function DetailHeader({
   category,
-  showDown = true,
 }: DetailHeaderProps) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -50,7 +48,6 @@ export default function DetailHeader({
             </button>
             {title}
           </S.LeftBox>
-          {showDown && <Down />}
         </S.DetailHeaderBox>
       </S.DetailHeader>
     </>
