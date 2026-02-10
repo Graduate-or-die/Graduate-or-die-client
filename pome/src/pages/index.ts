@@ -1,0 +1,15 @@
+export { default as MyPage } from "./MyPage";
+export { default as LoginPage } from "./LoginPage";
+export { default as HomePage } from "./HomePage";
+export { default as DetailPage } from "./DetailPage";
+export { default as RecommendPage } from "./RecommendPage";
+export { default as MateHomePage } from "./MateHomePage";
+export { default as MateDetailPage } from "./MateDetailPage";
+export { default as CommentPage } from "./CommentPage";
+export { default as ChatPage } from "./ChatPage";
+export { default as RequestPage } from "./RequestPage";
+export { default as MateMatchPage } from "./MateMatchPage";
+export { default as MateInactivePage } from "./MateInactivePage";
+export { default as MatePage } from "./MatePage";
+export { default as MyDetailPage } from "./MyDetailPage";
+export { default as MyCommentPage } from "./MyCommentPage";
