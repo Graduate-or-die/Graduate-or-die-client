@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { DETAIL_DEFAULT_MATE_CATEGORY } from "../../constants/defaultDetailItem";
 import { useParams } from "react-router-dom";
 import { CategoryKey } from "../../constants/categories";
