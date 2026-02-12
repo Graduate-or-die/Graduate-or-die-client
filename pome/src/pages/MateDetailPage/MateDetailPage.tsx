@@ -7,12 +7,10 @@ import TabBar from "../../components/TabBar";
 import DetailHeader from "../../components/DetailHeader";
 import MateDetailForm from "../../components/MateDetailFrom";
 export default function MateDetailPage() {
-  const [detailData, setDetailData] = useState(DETAIL_DEFAULT_MATE_CATEGORY);
   const { category } = useParams<{ category: CategoryKey }>();
   const safeCategory = category as CategoryKey;
   if (!safeCategory) return null;
 
-  const items = DETAIL_DEFAULT_MATE_CATEGORY[safeCategory];
   return (
     <>
       <DetailHeader category={safeCategory} />
