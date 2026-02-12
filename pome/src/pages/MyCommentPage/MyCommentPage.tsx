@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./MyCommentPage.style";
 import Comment from "../../components/Comment";

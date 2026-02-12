@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { styleEffect } from "framer-motion";
 
 export const FormContainer = styled.div`
   width: 364px;

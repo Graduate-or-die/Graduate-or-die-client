@@ -5,13 +5,13 @@ import TabBar from "../../components/TabBar";
 import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { EditPencil, HeartOn, SwitchOff, SwitchOn } from "../../icons";
-interface MyInfo {
+/* interface MyInfo {
   userName: string;
   nickName: string;
   introduction: string;
   job: string;
   matching: boolean;
-}
+} */
 export default function MyPage() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [isEditing, setIsEditing] = useState(false);

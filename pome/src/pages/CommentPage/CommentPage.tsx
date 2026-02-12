@@ -75,6 +75,7 @@ export default function CommentPage() {
         createdAt: new Date().toISOString(),
       },
     ]);
+    setComment("");
   };
 
   const handleDeleteAllComments = () => {
