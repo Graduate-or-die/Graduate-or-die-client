@@ -1,14 +1,7 @@
 import React from "react";
 import * as S from "./Comment.style";
 import { CommentProfile } from "../../assets";
-import { CategoryKey } from "../../constants/categories";
-type CommentItem = {
-  id: string;
-  category: CategoryKey;
-  itemId: string;
-  field: string;
-  content: string;
-};
+
 type CommentProps = {
   content: string;
   checked?: boolean;

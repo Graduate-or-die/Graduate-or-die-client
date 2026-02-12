@@ -1,10 +1,8 @@
 import React from "react";
 import * as S from "./LoginPage.style";
 import { KakaoImg } from "../../assets";
-import { useNavigate } from "react-router-dom";
 import { PomeLogo } from "../../icons";
 export default function LoginPage() {
-  const navigate = useNavigate();
   return (
     <>
       <S.PomeContainer>

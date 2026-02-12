@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import * as S from "./MyDetailPage.style";
 import MyDetailForm from "../../components/MyDetailForm";
 import DetailHeader from "../../components/DetailHeader";
@@ -10,7 +10,6 @@ import { DetailItem } from "../../types/detail";
 
 export default function MyDetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
-  const navigate = useNavigate();
 
   const safeCategory = category as CategoryKey;
 
