@@ -80,9 +80,9 @@ export default function DetailPage() {
     }
   };
 
-  const removeItem = (id: number) => {
+  /* const removeItem = (id: number) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
-  };
+  }; */
 
   const handleSelectMode = () => {
     setIsSelectMode(true);

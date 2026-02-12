@@ -110,11 +110,11 @@ export default function DetailForm({
     onChange?.({ ...rest, content: next });
   };
 
-  const savedLinks = (safeValue.links ?? [])
+  /* const savedLinks = (safeValue.links ?? [])
     .map((l) => l.trim())
     .filter(Boolean);
 
-  /* const renderLinks = (() => {
+  const renderLinks = (() => {
     if (isEditing && savedLinks.length === 0) {
       return [""];
     }
