@@ -36,19 +36,19 @@ export default function MyDetailPage() {
       default:
         const data = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
         if (Array.isArray(data)) {
-          setItems(data.map((e,idx) => ({ ...e, id: idx + 1 })));
+          setItems(data.map((e, idx) => ({ ...e, id: idx + 1 })));
         }
         break;
     }
   }, [safeCategory]);
 
-  const goToComment = (field: string, id?: string) => {
+  /* const goToComment = (field: string, id?: string) => {
     if (id) {
       navigate(`/my/detail/${safeCategory}/${id}/${field}`);
     } else {
       navigate(`/my/detail/${safeCategory}/${field}`);
     }
-  };
+  }; */
   return (
     <>
       <DetailHeader category={safeCategory} />

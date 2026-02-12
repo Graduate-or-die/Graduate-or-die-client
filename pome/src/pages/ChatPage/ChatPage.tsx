@@ -3,10 +3,8 @@ import * as S from "./ChatPage.style";
 import { Message } from "../../types/message";
 import ChatHeader from "../../components/ChatHeader";
 import SpeechBubbleList from "../../components/SpeechBubblesList";
-import SpeechBubbles from "../../components/SpeechBubbles";
 import Input from "../../components/Input";
 import AIquestion from "../../components/AIquestion";
-import TabBar from "../../components/TabBar";
 export default function ChatPage() {
   const initialMessages: Message[] = [
     {

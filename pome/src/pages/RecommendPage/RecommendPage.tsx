@@ -2,10 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as S from "./RecommendPage.style";
 import RecommendHeader from "../../components/RecommendHeader";
 import TabBar from "../../components/TabBar";
-import {
-  RecommendProfile,
-  RECOMMEND_DEFAULT_LIST,
-} from "../../constants/RecommendProfile";
+import { RECOMMEND_DEFAULT_LIST } from "../../constants/RecommendProfile";
 import { HeartOn, Search, SlideLeft, SlideRight } from "../../icons";
 import { DefaultProfile } from "../../assets";
 import Badge from "../../components/Badge";
@@ -25,18 +22,18 @@ export default function RecommendPage() {
   const handleNext = () => {
     setIsSearching(false);
     setCurrentIndex((prev) =>
-      prev === RECOMMEND_DEFAULT_LIST.length - 1 ? 0 : prev + 1
+      prev === RECOMMEND_DEFAULT_LIST.length - 1 ? 0 : prev + 1,
     );
   };
   const handlePrev = () => {
     setIsSearching(false);
     setCurrentIndex((prev) =>
-      prev === 0 ? RECOMMEND_DEFAULT_LIST.length - 1 : prev - 1
+      prev === 0 ? RECOMMEND_DEFAULT_LIST.length - 1 : prev - 1,
     );
   };
   const handleSearch = () => {
     const targetIndex = RECOMMEND_DEFAULT_LIST.findIndex(
-      (profile) => profile.nickname === searchValue.trim()
+      (profile) => profile.nickname === searchValue.trim(),
     );
 
     if (targetIndex === -1) {

@@ -1,13 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import * as S from "./SpeechBubbles.style";
 import { Message } from "../../types/message";
-import { Etc } from "../../icons";
 import { ChatProfile } from "../../assets";
 type MessageBubbleProps = {
   message: Message;
   isContinuous: boolean;
   onOpenPop: (pos: { x: number; y: number }) => void;
-  isSelected:boolean;
+  isSelected: boolean;
 };
 const LONG_PRESS_MS = 500;
 
@@ -17,7 +16,7 @@ export default function SpeechBubbles({
   isSelected,
   onOpenPop,
 }: MessageBubbleProps) {
-  const { isMine, content, id } = message;
+  const { isMine, content } = message;
   const timerRef = useRef<number | null>(null);
 
   const openByEvent = (e: React.MouseEvent | React.TouchEvent) => {
