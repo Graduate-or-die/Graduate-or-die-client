@@ -8,11 +8,11 @@ export default function LoginPage() {
   return (
     <>
       <S.PomeContainer>
-        <PomeLogo width={100} height={46}/>
+        <PomeLogo width={100} height={46} />
         <S.PomeBox>Portfolio with Mate</S.PomeBox>
       </S.PomeContainer>
       <S.KakaoContainer>
-        <img src={KakaoImg} width={22} height={22} />
+        <img src={KakaoImg} width={22} height={22} alt="" />
         <S.KakaoBox>Kakao로 시작하기</S.KakaoBox>
       </S.KakaoContainer>
     </>

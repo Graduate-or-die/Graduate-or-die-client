@@ -114,7 +114,7 @@ export default function DetailForm({
     .map((l) => l.trim())
     .filter(Boolean);
 
-  const renderLinks = (() => {
+  /* const renderLinks = (() => {
     if (isEditing && savedLinks.length === 0) {
       return [""];
     }
@@ -124,8 +124,8 @@ export default function DetailForm({
     }
 
     return savedLinks;
-  })();
-
+  })(); */
+  
   const Container = isEducation ? S.EduContainer : React.Fragment;
   const FormBoxContainer = isEducation ? S.EduFormContainer : S.FormContainer;
 

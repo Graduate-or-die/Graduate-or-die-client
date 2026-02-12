@@ -15,11 +15,11 @@ export default function MateMatchPage() {
         <S.MatchWrapper>
           <S.MateMatchContainer>
             <S.MateMatchBox>
-              <img src={MateMatchFont} />
+              <img src={MateMatchFont} alt="" />
             </S.MateMatchBox>
           </S.MateMatchContainer>
           <S.IconContainer>
-            <S.MatchEffectImg src={MatchEffect} />
+            <S.MatchEffectImg src={MatchEffect} alt="" />
             <S.PomeContainer>
               <S.PomeEffect>
                 <S.PomeLeft>

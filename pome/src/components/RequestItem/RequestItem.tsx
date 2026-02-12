@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import * as S from "./RequestItem.style";
 import { RequestProfile } from "../../assets";
-import NoticePop from "../NoticePop";
 
 type RequestItemProps = {
   userId: number;

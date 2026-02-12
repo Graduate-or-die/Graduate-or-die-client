@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Global, css } from "@emotion/react";
+import { Global} from "@emotion/react";
 import { PomeStyles } from "./styles/PomeStyles.style";
 import MateRouter from "./pages/MateRouter";
 import ChatRouter from "./pages/ChatRouter";

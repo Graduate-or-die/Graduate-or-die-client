@@ -2,7 +2,7 @@ import React from "react";
 import * as S from "./Comment.style";
 import { CommentProfile } from "../../assets";
 import { CategoryKey } from "../../constants/categories";
-type Comment = {
+type CommentItem = {
   id: string;
   category: CategoryKey;
   itemId: string;

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useRef } from "react";
 import * as S from "./Input.style";
 import { Send } from "../../icons";
 type InputProps = {
