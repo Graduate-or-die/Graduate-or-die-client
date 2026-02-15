@@ -13,3 +13,4 @@ export { default as MateInactivePage } from "./MateInactivePage";
 export { default as MatePage } from "./MatePage";
 export { default as MyDetailPage } from "./MyDetailPage";
 export { default as MyCommentPage } from "./MyCommentPage";
+export { default as KakaoCallbackPage } from "./KakaoCallbackPage";
