@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Global} from "@emotion/react";
+import { Global } from "@emotion/react";
 import { PomeStyles } from "./styles/PomeStyles.style";
 import MateRouter from "./pages/MateRouter";
 import ChatRouter from "./pages/ChatRouter";
@@ -16,6 +16,7 @@ import {
   MatePage,
   MyDetailPage,
   MyCommentPage,
+  KakaoCallbackPage,
 } from "./pages/index";
 export default function App() {
   return (
@@ -43,6 +44,7 @@ export default function App() {
           path="/my/detail/:category/:id/:field"
           element={<MyCommentPage />}
         />
+        <Route path="/auth/login" element={<KakaoCallbackPage />} />
       </Routes>
     </>
   );
