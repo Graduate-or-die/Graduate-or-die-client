@@ -3,7 +3,7 @@ import MateHomePage from "./MateHomePage";
 import MateInactivePage from "./MateInactivePage";
 export default function MateRouter() {
   const isMateEnabled = true;
-  const isMatched = true;
+  const isMatched = false;
   if (!isMateEnabled) {
     return <MateInactivePage variant="mate" />;
   }
