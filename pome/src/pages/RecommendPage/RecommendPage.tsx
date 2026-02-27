@@ -98,10 +98,6 @@ export default function RecommendPage() {
             <S.KeyBox>희망 직무</S.KeyBox>
             <S.ValueBox>{currentProfile.job}</S.ValueBox>
           </S.InfoBox>
-          <S.InfoBox>
-            <S.KeyBox>포트폴리오 ai 한줄 요약</S.KeyBox>
-            <S.ValueBox>{currentProfile.aiSummary}</S.ValueBox>
-          </S.InfoBox>
         </S.InfoContainer>
         <S.MatchingButton>매칭 신청</S.MatchingButton>
       </S.RecommendContainer>

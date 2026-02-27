@@ -84,9 +84,8 @@ export const SlideIcon = styled.div``;
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0 auto 20px;
-  gap: 6px;
-  flex: 1;
+  margin-bottom:20px;
+  gap: 15px;
 `;
 export const InfoBox = styled.div`
   display: flex;
