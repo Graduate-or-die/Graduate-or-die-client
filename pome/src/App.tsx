@@ -44,7 +44,7 @@ export default function App() {
           path="/my/detail/:category/:id/:field"
           element={<MyCommentPage />}
         />
-        <Route path="/auth/login" element={<KakaoCallbackPage />} />
+        <Route path="/auth/callback" element={<KakaoCallbackPage />} />
       </Routes>
     </>
   );

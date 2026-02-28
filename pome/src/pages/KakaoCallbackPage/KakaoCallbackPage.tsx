@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { jsonAxios } from "../../axios";
 export default function KakaoCallbackPage() {
   const navigate = useNavigate();
-
+  const hasRun = useRef(false);
   useEffect(() => {
+    if (hasRun.current) return;
+    hasRun.current = true;
     const code = new URLSearchParams(window.location.search).get("code");
     if (!code) return navigate("/");
 
@@ -22,5 +24,5 @@ export default function KakaoCallbackPage() {
       });
   }, [navigate]);
 
-  return <div>카카오 로그인 처리 중...</div>;
+  return <div>로그인 처리 중...</div>;
 }
