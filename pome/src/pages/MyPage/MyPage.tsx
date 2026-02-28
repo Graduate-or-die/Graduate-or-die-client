@@ -5,27 +5,22 @@ import TabBar from "../../components/TabBar";
 import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { EditPencil, HeartOn, SwitchOff, SwitchOn } from "../../icons";
-/* interface MyInfo {
-  userName: string;
-  nickName: string;
-  introduction: string;
-  job: string;
-  matching: boolean;
-} */
+import { getMyPage, patchMyPage } from "../../apis/mypage";
+
 export default function MyPage() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [likeCount, setLikeCount] = useState(0);
+  const [tags, setTags] = useState<string[]>([]);
   const [myInfo, setMyInfo] = useState({
-    userName: "윤현서",
-    nickName: "김혜림",
-    introduction: "저와 개발자 포트폴리오 쌓으실 분 구해요!",
-    job: "프론트엔드 개발자",
+    userName: "",
+    nickName: "",
+    introduction: "",
+    job: "",
     matching: false,
   });
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const introRef = useRef<HTMLTextAreaElement | null>(null);
 
   const toggleSwitch = () => {
@@ -59,6 +54,34 @@ export default function MyPage() {
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [myInfo.introduction]);
+  useEffect(() => {
+    const fetchMyPage = async () => {
+      try {
+        const res = await getMyPage();
+        const result = res.result;
+
+        setMyInfo({
+          userName: result.userName,
+          nickName: result.nickName,
+          introduction: result.introduction,
+          job: result.job,
+          matching: result.matching,
+        });
+
+        setIsSwitchOn(result.matching);
+        setLikeCount(result.likeCount);
+        setTags(result.tags);
+
+        if (result.profileImage) {
+          setProfileImage(result.profileImage);
+        }
+      } catch (error) {
+        console.error("마이페이지 조회 실패", error);
+      }
+    };
+
+    fetchMyPage();
+  }, []);
 
   const handleProfileClick = () => {
     if (!isEditing) return;
@@ -112,7 +135,7 @@ export default function MyPage() {
             <div>
               <HeartOn width={32} height={32} />
             </div>
-            <S.HeartCount>30</S.HeartCount>
+            <S.HeartCount>{likeCount}</S.HeartCount>
           </S.HeartBox>
           <S.EditBox
             onClick={() => setIsEditing((prev) => !prev)}
