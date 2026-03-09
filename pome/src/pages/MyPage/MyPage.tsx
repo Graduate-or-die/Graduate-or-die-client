@@ -5,27 +5,23 @@ import TabBar from "../../components/TabBar";
 import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { EditPencil, HeartOn, SwitchOff, SwitchOn } from "../../icons";
-/* interface MyInfo {
-  userName: string;
-  nickName: string;
-  introduction: string;
-  job: string;
-  matching: boolean;
-} */
+import { getMyPage, patchMyPage, getProfile } from "../../apis/mypage";
+
 export default function MyPage() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-
+  const [likeCount, setLikeCount] = useState(0);
+  const [tags, setTags] = useState<string[]>([]);
   const [myInfo, setMyInfo] = useState({
-    userName: "윤현서",
-    nickName: "김혜림",
-    introduction: "저와 개발자 포트폴리오 쌓으실 분 구해요!",
-    job: "프론트엔드 개발자",
+    userName: "",
+    nickName: "",
+    introduction: "",
+    job: "",
     matching: false,
   });
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-
   const introRef = useRef<HTMLTextAreaElement | null>(null);
 
   const toggleSwitch = () => {
@@ -60,6 +56,68 @@ export default function MyPage() {
     el.style.height = `${el.scrollHeight}px`;
   }, [myInfo.introduction]);
 
+  useEffect(() => {
+    const fetchMyPage = async () => {
+      try {
+        const res = await getMyPage();
+        const result = res.result;
+
+        setMyInfo({
+          userName: result.userName,
+          nickName: result.nickName,
+          introduction: result.introduction,
+          job: result.job,
+          matching: result.matching,
+        });
+
+        setIsSwitchOn(result.matching);
+        setLikeCount(result.likeCount);
+        setTags(result.tags);
+
+        const profile = await getProfile();
+        setProfileImage(profile);
+      } catch (error) {
+        console.error("마이페이지 조회 실패", error);
+      }
+    };
+
+    fetchMyPage();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const payload = {
+        ...myInfo,
+        removeProfileImage: false,
+      };
+
+      const res = await patchMyPage(
+        payload,
+        selectedFile ? [selectedFile] : undefined,
+      );
+
+      const result = res.result;
+
+      setMyInfo({
+        userName: result.userName,
+        nickName: result.nickName,
+        introduction: result.introduction,
+        job: result.job,
+        matching: result.matching,
+      });
+
+      setIsSwitchOn(result.matching);
+      const profile = await getProfile();
+      setProfileImage(profile);
+      setSelectedFile(null);
+      alert("수정되었습니다.");
+    } catch (error) {
+      console.error("마이페이지 수정 실패", error);
+    } finally {
+      setIsEditing(false);
+    }
+  };
+
   const handleProfileClick = () => {
     if (!isEditing) return;
     fileInputRef.current?.click();
@@ -68,14 +126,15 @@ export default function MyPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith("image/")) return;
+    setSelectedFile(file);
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setProfileImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   return (
@@ -112,10 +171,16 @@ export default function MyPage() {
             <div>
               <HeartOn width={32} height={32} />
             </div>
-            <S.HeartCount>30</S.HeartCount>
+            <S.HeartCount>{likeCount}</S.HeartCount>
           </S.HeartBox>
           <S.EditBox
-            onClick={() => setIsEditing((prev) => !prev)}
+            onClick={() => {
+              if (isEditing) {
+                handleSave();
+              } else {
+                setIsEditing(true);
+              }
+            }}
             style={{ cursor: "pointer" }}
           >
             <EditPencil width={32} height={32} />
