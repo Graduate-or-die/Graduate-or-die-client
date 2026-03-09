@@ -25,3 +25,11 @@ export const patchMyPage = async (data: PatchMyPageRequest, files?: File[]) => {
 
   return res.data;
 };
+export const getProfile = async () => {
+  const res = await jsonAxios.get("/files/profile", {
+    responseType: "blob",
+  });
+  const imageUrl = URL.createObjectURL(res.data);
+
+  return imageUrl;
+};

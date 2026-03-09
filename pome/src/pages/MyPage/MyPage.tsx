@@ -5,7 +5,7 @@ import TabBar from "../../components/TabBar";
 import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { EditPencil, HeartOn, SwitchOff, SwitchOn } from "../../icons";
-import { getMyPage, patchMyPage } from "../../apis/mypage";
+import { getMyPage, patchMyPage, getProfile } from "../../apis/mypage";
 
 export default function MyPage() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);
@@ -20,6 +20,7 @@ export default function MyPage() {
     matching: false,
   });
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const introRef = useRef<HTMLTextAreaElement | null>(null);
 
@@ -54,6 +55,7 @@ export default function MyPage() {
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [myInfo.introduction]);
+
   useEffect(() => {
     const fetchMyPage = async () => {
       try {
@@ -72,9 +74,8 @@ export default function MyPage() {
         setLikeCount(result.likeCount);
         setTags(result.tags);
 
-        if (result.profileImage) {
-          setProfileImage(result.profileImage);
-        }
+        const profile = await getProfile();
+        setProfileImage(profile);
       } catch (error) {
         console.error("마이페이지 조회 실패", error);
       }
@@ -82,6 +83,40 @@ export default function MyPage() {
 
     fetchMyPage();
   }, []);
+
+  const handleSave = async () => {
+    try {
+      const payload = {
+        ...myInfo,
+        removeProfileImage: false,
+      };
+
+      const res = await patchMyPage(
+        payload,
+        selectedFile ? [selectedFile] : undefined,
+      );
+
+      const result = res.result;
+
+      setMyInfo({
+        userName: result.userName,
+        nickName: result.nickName,
+        introduction: result.introduction,
+        job: result.job,
+        matching: result.matching,
+      });
+
+      setIsSwitchOn(result.matching);
+      const profile = await getProfile();
+      setProfileImage(profile);
+      setSelectedFile(null);
+      alert("수정되었습니다.");
+    } catch (error) {
+      console.error("마이페이지 수정 실패", error);
+    } finally {
+      setIsEditing(false);
+    }
+  };
 
   const handleProfileClick = () => {
     if (!isEditing) return;
@@ -91,14 +126,15 @@ export default function MyPage() {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     if (!file.type.startsWith("image/")) return;
+    setSelectedFile(file);
 
     const reader = new FileReader();
     reader.onloadend = () => {
       setProfileImage(reader.result as string);
     };
     reader.readAsDataURL(file);
+    e.target.value = "";
   };
 
   return (
@@ -138,7 +174,13 @@ export default function MyPage() {
             <S.HeartCount>{likeCount}</S.HeartCount>
           </S.HeartBox>
           <S.EditBox
-            onClick={() => setIsEditing((prev) => !prev)}
+            onClick={() => {
+              if (isEditing) {
+                handleSave();
+              } else {
+                setIsEditing(true);
+              }
+            }}
             style={{ cursor: "pointer" }}
           >
             <EditPencil width={32} height={32} />
