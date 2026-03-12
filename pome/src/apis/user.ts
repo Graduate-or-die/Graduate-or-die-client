@@ -33,3 +33,11 @@ export const getProfile = async () => {
 
   return imageUrl;
 };
+
+export const getUserSearch = async (name: string) => {
+  const res = await jsonAxios.get("/users/search", {
+    params: { name },
+  });
+
+  return res.data;
+};

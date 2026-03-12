@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as S from "./RequestPage.style";
 import Header from "../../components/Header";
 import RequestItem from "../../components/RequestItem";
-import { RECOMMEND_DEFAULT_LIST } from "../../constants/RecommendProfile";
 import { useNavigate } from "react-router-dom";
 import NoticePop from "../../components/NoticePop";
+import {
+  getMateRequests,
+  postAcceptMate,
+  patchRejectMate,
+} from "../../apis/mate";
 type User = {
   userId: number;
   nickname: string;
@@ -14,44 +18,72 @@ type User = {
 export default function RequestPage() {
   const navigate = useNavigate();
 
-  const [users, setUsers] = useState<User[]>(
-    RECOMMEND_DEFAULT_LIST.map(({ userId, nickname, job, isMatched }) => ({
-      userId,
-      nickname,
-      job,
-      isMatched,
-    })),
-  );
+  const [users, setUsers] = useState<User[]>([]);
   const [showNotice, setShowNotice] = useState(false);
   const [selectedMateName, setSelectedMateName] = useState("");
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
-  const handleAccept = (profile: {
+  const fetchRequests = async () => {
+    try {
+      const res = await getMateRequests();
+
+      const mapped = res.result.map((u: any) => ({
+        userId: u.mateId,
+        nickname: u.mateNickname,
+        job: "직무 정보 없음",
+        isMatched: false,
+      }));
+
+      setUsers(mapped);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAccept = async (profile: {
     userId: number;
     nickname: string;
     isMatched: boolean;
   }) => {
-    if (profile.isMatched) {
+    try {
+      await postAcceptMate(profile.userId);
+      navigate("/match");
+    } catch (err) {
+      console.error(err);
       setSelectedMateName(profile.nickname);
       setSelectedUserId(profile.userId);
       setShowNotice(true);
-      return;
     }
+  };
+  const handleReject = async (userId: number) => {
+    try {
+      await patchRejectMate(userId);
+      setUsers((prev) => prev.filter((user) => user.userId !== userId));
+      await fetchRequests();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-    navigate("/match");
-  };
-  const handleReject = (userId: number) => {
-    setUsers((prev) => prev.filter((user) => user.userId !== userId));
-  };
-  const handleCloseNotice = () => {
+  const handleCloseNotice = async () => {
     if (selectedUserId !== null) {
-      setUsers((prev) => prev.filter((u) => u.userId !== selectedUserId));
+      try {
+        await patchRejectMate(selectedUserId);
+
+        setUsers((prev) => prev.filter((u) => u.userId !== selectedUserId));
+      } catch (err) {
+        console.error(err);
+      }
     }
 
     setShowNotice(false);
     setSelectedMateName("");
     setSelectedUserId(null);
   };
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
 
   return (
     <>
