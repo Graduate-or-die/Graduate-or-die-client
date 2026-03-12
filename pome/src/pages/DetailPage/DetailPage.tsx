@@ -6,92 +6,100 @@ import DetailForm from "../../components/DetailForm";
 import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
 import TabBar from "../../components/TabBar";
-import { DETAIL_DEFAULT_BY_CATEGORY } from "../../constants/defaultDetailItem";
 import { DetailItem } from "../../types/detail";
+import {
+  getPortfolio,
+  patchEducations,
+  postExperiences,
+  patchExperiences,
+} from "../../apis/portfolio";
+
+type ExperienceWithKey = DetailItem & {
+  localId: string;
+  experienceId?: number;
+};
 
 export default function DetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
   const navigate = useNavigate();
-
   const safeCategory = category as CategoryKey;
 
   const [isEditing] = useState(true);
   const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [education, setEducation] = useState<DetailItem>({
-    ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-    id: 1,
+    school: "",
+    major: "",
+    degree: "",
   });
-  const [experiences, setExperiences] = useState<DetailItem[]>([]);
-  const [items, setItems] = useState<DetailItem[]>([]);
+
+  const [experiences, setExperiences] = useState<ExperienceWithKey[]>([]);
+  const [originalExperiences, setOriginalExperiences] = useState<
+    ExperienceWithKey[]
+  >([]);
 
   useEffect(() => {
-    switch (safeCategory) {
-      case "education":
-        setEducation({
-          ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-          id: 1,
-        });
-        setExperiences(
-          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e, idx) => ({
-            ...e,
-            id: idx + 1,
-          })),
-        );
-        break;
+    const fetchPortfolio = async () => {
+      try {
+        const eduData = await getPortfolio(1);
+        const expData = await getPortfolio(2);
 
-      case "etc":
-        setItems(
-          DETAIL_DEFAULT_BY_CATEGORY.etc.map((e, idx) => ({
-            ...e,
-            id: idx + 1,
-          })),
-        );
-
-        break;
-
-      default:
-        const defaultData = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
-        if (Array.isArray(defaultData)) {
-          setItems(defaultData.map((e, idx) => ({ ...e, id: idx + 1 })));
+        const eduItems = eduData?.item?.items ?? [];
+        if (eduItems.length > 0) {
+          const edu = eduItems[0];
+          setEducation({
+            school: String(edu.school ?? ""),
+            major: String(edu.major ?? ""),
+            degree: String(edu.degree ?? ""),
+          });
         }
-        break;
-    }
-  }, [safeCategory]);
 
-  const handleItemChange = (id: number, value: DetailItem) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? value : item)));
-  };
+        const expItems = expData?.item?.items ?? [];
+        const mapped = expItems.map((exp: any) => ({
+          experienceId: exp.experienceId,
+          localId: `srv-${exp.experienceId}`,
+          workplace: String(exp.workplace ?? ""),
+          spot: String(exp.spot ?? ""),
+          experienceStartAt: String(exp.experienceStartAt ?? ""),
+          experienceEndAt: String(exp.experienceEndAt ?? ""),
+        }));
+        setExperiences(mapped);
+        setOriginalExperiences(mapped);
+      } catch (err) {
+        console.error("포트폴리오 조회 실패", err);
+      }
+    };
 
-  const handleEducationChange = (value: DetailItem) => {
-    setEducation(value);
-  };
+    fetchPortfolio();
+  }, []);
 
-  const handleExperienceChange = (id: number, value: DetailItem) => {
+  const handleEducationChange = (value: DetailItem) => setEducation(value);
+
+  const handleExperienceChange = (key: string, value: DetailItem) => {
     setExperiences((prev) =>
-      prev.map((item) => (item.id === id ? value : item)),
+      prev.map((item) => (item.localId === key ? { ...item, ...value } : item)),
     );
   };
-  const handleAdd = () => {
-    if (safeCategory === "education") {
-      setExperiences((prev) => [...prev, { id: prev.length + 1 }]);
-    } else {
-      setItems((prev) => [...prev, { id: prev.length + 1 }]);
-    }
-  };
 
-  /* const removeItem = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }; */
+  const handleAdd = () => {
+    const newExp: ExperienceWithKey = {
+      localId: `tmp-${Date.now()}`,
+      workplace: "",
+      spot: "",
+      experienceStartAt: "",
+      experienceEndAt: "",
+    };
+    setExperiences((prev) => [...prev, newExp]);
+  };
 
   const handleSelectMode = () => {
     setIsSelectMode(true);
     setSelectedIds([]);
   };
 
-  const toggleSelect = (id: number) => {
+  const toggleSelect = (key: string) => {
     setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+      prev.includes(key) ? prev.filter((i) => i !== key) : [...prev, key],
     );
   };
 
@@ -100,47 +108,96 @@ export default function DetailPage() {
       setIsSelectMode(false);
       return;
     }
-
-    if (safeCategory === "education") {
-      setExperiences((prev) =>
-        prev.filter((item) => !selectedIds.includes(item.id)),
-      );
-    } else {
-      setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
-    }
+    setExperiences((prev) =>
+      prev.filter((item) => !selectedIds.includes(item.localId)),
+    );
     setSelectedIds([]);
     setIsSelectMode(false);
   };
 
-  const normalizeItem = (item: DetailItem): DetailItem => {
-    const next = { ...item };
+  const isValidDateFormat = (date: string) => {
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    return regex.test(date);
+  };
 
-    if (Array.isArray(next.links)) {
-      const cleaned = next.links.map((l) => l.trim()).filter(Boolean);
+  const handleDone = async () => {
+    for (const exp of experiences) {
+      if (
+        exp.experienceStartAt &&
+        !isValidDateFormat(String(exp.experienceStartAt))
+      ) {
+        alert("시작일은 YYYY-MM-DD 형식으로 입력해주세요.");
+        return;
+      }
 
-      if (cleaned.length > 0) {
-        next.links = cleaned;
-      } else {
-        delete next.links;
+      if (
+        exp.experienceEndAt &&
+        !isValidDateFormat(String(exp.experienceEndAt))
+      ) {
+        alert("종료일은 YYYY-MM-DD 형식으로 입력해주세요.");
+        return;
       }
     }
+    try {
+      if (safeCategory === "education") {
+        await patchEducations({
+          school: String(education.school ?? ""),
+          major: String(education.major ?? ""),
+          degree: String(education.degree ?? ""),
+        });
 
-    return next;
-  };
+        const validExperiences = experiences.filter(
+          (exp) =>
+            exp.workplace ||
+            exp.spot ||
+            exp.experienceStartAt ||
+            exp.experienceEndAt,
+        );
 
-  const handleDone = () => {
-    if (safeCategory === "education") {
-      console.log("저장될 데이터:", {
-        education: normalizeItem(education),
-        experiences: experiences.map(normalizeItem),
-      });
-    } else {
-      console.log("저장될 데이터:", items.map(normalizeItem));
+        const updated = await Promise.all(
+          validExperiences.map(async (exp) => {
+            const original = originalExperiences.find(
+              (o) => o.experienceId === exp.experienceId,
+            );
+            const payload = {
+              workplace: String(exp.workplace),
+              spot: String(exp.spot),
+              experienceStartAt: String(exp.experienceStartAt),
+              experienceEndAt: String(exp.experienceEndAt),
+            };
+
+            if (exp.experienceId) {
+              if (
+                original &&
+                original.workplace === exp.workplace &&
+                original.spot === exp.spot &&
+                original.experienceStartAt === exp.experienceStartAt &&
+                original.experienceEndAt === exp.experienceEndAt
+              ) {
+                return exp;
+              }
+              await patchExperiences(exp.experienceId, payload);
+              return exp;
+            } else {
+              const res = await postExperiences(payload);
+              return {
+                ...exp,
+                experienceId: res.result.experienceId,
+                localId: `srv-${res.result.experienceId}`,
+              };
+            }
+          }),
+        );
+
+        setExperiences(updated);
+        setOriginalExperiences(updated);
+      }
+
+      navigate("/home");
+    } catch (error) {
+      console.error("저장 실패", error);
     }
-    navigate("/home");
   };
-
-  const showPlus = safeCategory !== "etc";
 
   return (
     <>
@@ -148,7 +205,6 @@ export default function DetailPage() {
 
       <S.DoneTrashContainer>
         <S.DoneBox onClick={handleDone}>완료</S.DoneBox>
-
         {!isSelectMode ? (
           <S.DoneBox onClick={handleSelectMode}>선택</S.DoneBox>
         ) : (
@@ -162,7 +218,7 @@ export default function DetailPage() {
       </S.DoneTrashContainer>
 
       <S.FormContainer>
-        {safeCategory === "education" ? (
+        {safeCategory === "education" && (
           <>
             <DetailForm
               category="education"
@@ -170,37 +226,23 @@ export default function DetailPage() {
               isEditing={isEditing}
               onChange={handleEducationChange}
             />
-
             {experiences.map((item) => (
               <DetailForm
-                key={item.id}
+                key={item.localId}
                 category="experience"
                 value={item}
                 isEditing={isEditing}
                 isSelectMode={isSelectMode}
-                isSelected={selectedIds.includes(item.id)}
-                onToggleSelect={() => toggleSelect(item.id)}
-                onChange={(v) => handleExperienceChange(item.id, v)}
+                isSelected={selectedIds.includes(item.localId)}
+                onToggleSelect={() => toggleSelect(item.localId)}
+                onChange={(v) => handleExperienceChange(item.localId, v)}
               />
             ))}
           </>
-        ) : (
-          items.map((item) => (
-            <DetailForm
-              key={item.id}
-              category={safeCategory}
-              value={item}
-              isEditing={isEditing}
-              isSelectMode={isSelectMode}
-              isSelected={selectedIds.includes(item.id)}
-              onToggleSelect={() => toggleSelect(item.id)}
-              onChange={(v) => handleItemChange(item.id, v)}
-            />
-          ))
         )}
       </S.FormContainer>
 
-      {showPlus && (
+      {safeCategory === "education" && (
         <S.PlusBox onClick={handleAdd}>
           <Plus style={{ color: "#0086AB" }} />
         </S.PlusBox>

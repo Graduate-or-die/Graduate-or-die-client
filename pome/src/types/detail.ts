@@ -6,9 +6,12 @@ export type CommentItem = {
 };
 
 export type DetailItemBase = {
-  id: number;
+  id?: number;
+  educationId?: number;
+  experienceId?: number;
   links?: string[];
-  comments?: CommentItem[];
+  comments?: string[];
+  localId?: string;
 };
 
 export type DetailItem = DetailItemBase & {

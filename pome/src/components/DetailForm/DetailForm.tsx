@@ -125,9 +125,24 @@ export default function DetailForm({
 
     return savedLinks;
   })(); */
-  
+
   const Container = isEducation ? S.EduContainer : React.Fragment;
   const FormBoxContainer = isEducation ? S.EduFormContainer : S.FormContainer;
+  const getPeriodFieldNames = (category: CategoryKey) => {
+    switch (category) {
+      case "experience":
+        return { start: "experienceStartAt", end: "experienceEndAt" };
+
+      case "activity":
+        return { start: "activityStartAt", end: "activityEndAt" };
+
+      case "project":
+        return { start: "projectStartAt", end: "projectEndAt" };
+
+      default:
+        return { start: "periodStart", end: "periodEnd" };
+    }
+  };
 
   const renderField = (field: Field) => {
     const rawValue = safeValue[field.name];
@@ -136,7 +151,7 @@ export default function DetailForm({
       typeof rawValue === "number" ||
       Array.isArray(rawValue)
         ? rawValue
-        : undefined;
+        : "";
 
     const showRedDot = isMyPage && hasComment(category, field.name, value.id);
 
@@ -165,31 +180,36 @@ export default function DetailForm({
         </S.FormLabel>
 
         {field.kind === "period" ? (
-          <S.PeriodBox>
-            <S.DateBox
-              name="periodStart"
-              value={(safeValue.periodStart as string) || ""}
-              onChange={handleChange}
-              readOnly={!isEditing}
-              onClick={() => {
-                if (!isEditing) {
-                  onFieldClick?.(field.name);
-                }
-              }}
-            />
-            <span>~</span>
-            <S.DateBox
-              name="periodEnd"
-              value={(safeValue.periodEnd as string) || ""}
-              onChange={handleChange}
-              readOnly={!isEditing || exprDisabled[field.name]}
-              onClick={() => {
-                if (!isEditing) {
-                  onFieldClick?.(field.name);
-                }
-              }}
-            />
-          </S.PeriodBox>
+          (() => {
+            const { start, end } = getPeriodFieldNames(category);
+            return (
+              <S.PeriodBox>
+                <S.DateBox
+                  name={start}
+                  value={(safeValue[start] as string) || ""}
+                  onChange={handleChange}
+                  readOnly={!isEditing}
+                  onClick={() => {
+                    if (!isEditing) {
+                      onFieldClick?.(field.name);
+                    }
+                  }}
+                />
+                <span>~</span>
+                <S.DateBox
+                  name={end}
+                  value={(safeValue[end] as string) || ""}
+                  onChange={handleChange}
+                  readOnly={!isEditing || exprDisabled[field.name]}
+                  onClick={() => {
+                    if (!isEditing) {
+                      onFieldClick?.(field.name);
+                    }
+                  }}
+                />
+              </S.PeriodBox>
+            );
+          })()
         ) : field.kind === "textarea" ? (
           <S.FormBoxArea
             name={field.name}
