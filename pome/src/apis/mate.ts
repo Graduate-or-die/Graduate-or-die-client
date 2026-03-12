@@ -12,7 +12,7 @@ export const patchAcceptMate = async (mateId: number) => {
   const res = await jsonAxios.patch(`/mates/${mateId}`);
   return res.data;
 };
-export const postRejectMate = async (mateId: number) => {
+export const postRequestMate = async (mateId: number) => {
   const res = await jsonAxios.post(`/mates/requests/${mateId}`);
   return res.data;
 };
