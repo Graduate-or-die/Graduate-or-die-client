@@ -7,13 +7,12 @@ export type CommentItem = {
 
 export type DetailItemBase = {
   id?: number;
-  educationId?: number;
-  experienceId?: number;
+  blockId?: number;
   links?: string[];
   comments?: string[];
-  localId?: string;
 };
 
 export type DetailItem = DetailItemBase & {
+  file?: File | string | null;
   [key: string]: DetailValue | undefined;
 };
