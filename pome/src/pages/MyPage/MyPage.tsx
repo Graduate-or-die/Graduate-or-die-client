@@ -5,7 +5,7 @@ import TabBar from "../../components/TabBar";
 import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { EditPencil, HeartOn, SwitchOff, SwitchOn } from "../../icons";
-import { getMyPage, patchMyPage, getProfile } from "../../apis/mypage";
+import { getMyPage, patchMyPage, getProfile } from "../../apis/user";
 
 export default function MyPage() {
   const [isSwitchOn, setIsSwitchOn] = useState(true);

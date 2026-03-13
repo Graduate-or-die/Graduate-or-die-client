@@ -4,12 +4,12 @@ import SpeechBubbles from "../SpeechBubbles";
 import ChatDeletePop from "../ChatDeletePop";
 type Props = {
   messages: Message[];
-  onDelete: (id: string) => void;
+  onDelete: (id: number) => void;
 };
 
 export default function SpeechBubbleList({ messages, onDelete }: Props) {
   const [popState, setPopState] = useState<{
-    id: string;
+    id: number;
     x: number;
     y: number;
   } | null>(null);

@@ -1,7 +1,6 @@
 export type Message = {
-  id: string;
-  roomId: string;
-  senderId: string;
+  id: number;
+  senderId: number;
   content: string;
   createdAt: string;
   isMine: boolean;
