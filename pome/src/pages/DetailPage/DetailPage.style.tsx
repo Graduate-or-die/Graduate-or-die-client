@@ -40,7 +40,7 @@ export const PlusBox = styled.div`
   padding-bottom: 110px;
 `;
 
-export const TrashIconWrapper = styled.div`
-  margin-top: 60px;
-  cursor: pointer;
+export const TrashBox = styled(DoneBox)`
+  background: transparent;
+  padding-left: 20px;
 `;

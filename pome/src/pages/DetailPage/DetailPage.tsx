@@ -204,12 +204,12 @@ export default function DetailPage() {
         {!isSelectMode ? (
           <S.DoneBox onClick={handleSelectMode}>선택</S.DoneBox>
         ) : (
-          <S.TrashIconWrapper>
+          <S.TrashBox>
             <Trash
               onClick={handleDeleteSelected}
               style={{ cursor: "pointer" }}
             />
-          </S.TrashIconWrapper>
+          </S.TrashBox>
         )}
       </S.DoneTrashContainer>
 
