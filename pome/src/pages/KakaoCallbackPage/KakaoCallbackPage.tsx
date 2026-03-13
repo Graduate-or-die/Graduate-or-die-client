@@ -13,8 +13,9 @@ export default function KakaoCallbackPage() {
     jsonAxios
       .post("/auth/login", { code })
       .then((res) => {
-        const accessToken = res.data.result.accessToken;
+        const { accessToken, userId } = res.data.result;
         localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("userId", String(userId));
         navigate("/home");
       })
       .catch((err) => {

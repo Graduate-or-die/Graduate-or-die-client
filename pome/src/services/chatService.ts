@@ -4,7 +4,7 @@ let mockMessages: Message[] = [];
 export const chatService = {
   getMessages: async (roomId: string) => {
     await delay(300);
-    return mockMessages.filter((m) => m.roomId === roomId);
+    return mockMessages;
   },
 
   sendMessage: async (message: Message) => {

@@ -16,7 +16,10 @@ function Input(
   const handleSubmit = () => {
     if (!value.trim()) return;
     onSubmit(value);
-    inputRef.current?.focus();
+
+    if (ref && typeof ref !== "function") {
+      ref.current?.focus();
+    }
   };
 
   return (
@@ -30,6 +33,7 @@ function Input(
             onChange={onChange}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
+                e.preventDefault();
                 handleSubmit();
               }
             }}
