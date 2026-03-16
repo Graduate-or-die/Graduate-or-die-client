@@ -42,7 +42,6 @@ export default function DetailForm({
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState("");
-  const [exprDisabled, setExprDisabled] = useState<Record<string, boolean>>({});
 
   const safeValue = value ?? ({} as DetailItem);
   const isEtcItem = (item: DetailItem): item is EtcItem => "link" in item;
@@ -58,7 +57,7 @@ export default function DetailForm({
   const getFieldValue = (name: string) => (safeValue as any)[name] ?? "";
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value: inputValue } = e.target;
     onChange?.({ ...safeValue, [name]: inputValue } as DetailItem);
@@ -69,7 +68,6 @@ export default function DetailForm({
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setFileName(file.name);
     onChange?.({ ...safeValue, [e.target.name]: file } as DetailItem);
   };
@@ -84,34 +82,30 @@ export default function DetailForm({
     onChange?.({ ...safeValue, file: null } as DetailItem);
   };
 
-  const toggleExpr = (name: string) => {
+  const toggleExpr = (fieldName: string) => {
     if (!isEditing) return;
 
-    const currentlyDisabled =
-      exprDisabled[name] ?? (safeValue as any)[name] === null;
-    const newValue = currentlyDisabled ? "" : null;
+    const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
+    const newHasEndAt = !hasEndAt;
 
-    setExprDisabled((prev) => ({ ...prev, [name]: !prev[name] }));
-
-    const updatedValue: any = { ...safeValue, [name]: newValue };
-    if (name === "qualificationEndAt")
-      updatedValue.hasQualificationEndAt = newValue !== null;
+    const updatedValue: any = {
+      ...safeValue,
+      hasQualificationEndAt: newHasEndAt,
+      qualificationEndAt: newHasEndAt ? getFieldValue("qualificationEndAt") : null,
+    };
 
     onChange?.(updatedValue);
   };
 
   const handleLinkAdd = () => {
     if (!isEditing || !isEtcItem(safeValue) || visibleLinkCount >= 4) return;
-
     onChange?.({ ...safeValue, link: [...(safeValue.link ?? []), ""] });
   };
 
   const handleLinkChange = (index: number, newValue: string) => {
     if (!isEtcItem(safeValue)) return;
-
     const nextLinks = [...(safeValue.link ?? [])];
     nextLinks[index] = newValue;
-
     onChange?.({ ...safeValue, link: nextLinks });
   };
 
@@ -130,20 +124,25 @@ export default function DetailForm({
 
   const renderPeriodField = (field: Field) => {
     const { start, end } = getPeriodFieldNames(category);
+    const startValue = getFieldValue(start);
+    const endValue = getFieldValue(end);
+    const startReadOnly = !isEditing || startValue === null;
+    const endReadOnly = !isEditing || endValue === null;
+
     return (
       <S.PeriodBox>
         <S.DateBox
           name={start}
-          value={getFieldValue(start)}
+          value={startValue ?? ""}
           onChange={handleChange}
-          readOnly={!isEditing}
+          readOnly={startReadOnly}
         />
         <span>~</span>
         <S.DateBox
           name={end}
-          value={getFieldValue(end)}
+          value={endValue ?? ""}
           onChange={handleChange}
-          readOnly={!isEditing || exprDisabled[field.name]}
+          readOnly={endReadOnly}
         />
       </S.PeriodBox>
     );
@@ -183,14 +182,15 @@ export default function DetailForm({
   );
 
   const renderExprField = (field: Field) => {
-    const value = getFieldValue(field.name);
-    const isDisabled = value === null || exprDisabled[field.name];
+    const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
+    const value = hasEndAt ? getFieldValue(field.name) : null;
+    const isDisabled = !hasEndAt;
 
     return (
       <>
         <S.FormBox
           name={field.name}
-          value={value}
+          value={value ?? ""}
           onChange={handleChange}
           disabledTone={isDisabled}
           readOnly={!isEditing || isDisabled}
@@ -237,6 +237,8 @@ export default function DetailForm({
     const inputValue = getFieldValue(field.name);
     const showRedDot = isMyPage && hasComment(category, field.name, value?.id);
 
+    const isDisabled = !isEditing || (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
+
     return (
       <S.FormRow key={field.name}>
         <S.FormLabel>
@@ -253,18 +255,18 @@ export default function DetailForm({
         ) : field.kind === "textarea" ? (
           <S.FormBoxArea
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
-            readOnly={!isEditing}
+            readOnly={isDisabled}
           />
         ) : field.kind === "file" ? (
           renderFileField(field)
         ) : field.kind === "memo" ? (
           <S.Memo
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
-            readOnly={!isEditing}
+            readOnly={isDisabled}
           />
         ) : field.kind === "expr" ? (
           renderExprField(field)
@@ -273,10 +275,10 @@ export default function DetailForm({
         ) : (
           <S.FormBox
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
             gray={isEducation || field.group === "education"}
-            readOnly={!isEditing}
+            readOnly={isDisabled}
           />
         )}
       </S.FormRow>
