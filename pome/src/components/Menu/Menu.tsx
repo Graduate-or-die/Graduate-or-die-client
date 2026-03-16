@@ -37,7 +37,7 @@ const MENU_DISPLAY_FIELDS: Partial<
 
   award: (item) => `${item.title} | ${item.grade} | ${item.organization}`,
 
-  certificate: (item) => `${item.name} | ${item.issuer}`,
+  qualification: (item) => `${item.name} | ${item.issuer}`,
 
   project: (item) => `${item.name} | ${item.role}`,
 };
@@ -177,9 +177,9 @@ export default function Menu({ data, basePath, isOwner }: MenuProps) {
 
       <MenuSection
         title="자격증"
-        category={["certificate"]}
+        category={["qualification"]}
         data={data}
-        items={data.certificate}
+        items={data.qualification}
         basePath={basePath}
         isOwner={isOwner}
         isPublic={true}

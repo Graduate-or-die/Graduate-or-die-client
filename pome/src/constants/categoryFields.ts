@@ -33,7 +33,7 @@ export const CATEGORY_FIELDS: Record<CategoryKey, Field[]> = {
     { name: "awardGrade", label: "시상등급" },
     { name: "file", label: "상장", kind: "file" },
   ],
-  certificate: [
+  qualification: [
     { name: "qualificationName", label: "자격증명" },
     { name: "qualificationOrganization", label: "발급기관" },
     { name: "qualificationStartAt", label: "취득일자" },

@@ -7,6 +7,8 @@ import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
 import TabBar from "../../components/TabBar";
 import { DetailItem } from "../../types/detail";
+import { defaultItems } from "../../constants/defaultItems";
+
 import {
   getPortfolio,
   deletePortfolio,
@@ -14,95 +16,88 @@ import {
   patchEducations,
   postExperiences,
   patchExperiences,
+  postActivities,
+  patchActivities,
+  postProjects,
+  patchProjects,
+  postAwards,
+  patchAwards,
+  postCapacities,
+  patchCapacities,
+  postEtc,
+  patchEtc,
+  deleteAttachment,
 } from "../../apis/portfolio";
-
-type ExperienceWithKey = DetailItem & {
-  blockId?: number;
-};
 
 export default function DetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
   const navigate = useNavigate();
   const safeCategory = category as CategoryKey;
 
-  const [isEditing] = useState(true);
+  const [education, setEducation] = useState<DetailItem | null>(null);
+  const [experiences, setExperiences] = useState<DetailItem[]>([]);
+  const [items, setItems] = useState<DetailItem[]>([]);
+  const [etc, setEtc] = useState<DetailItem | null>(null);
+
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
-  const [education, setEducation] = useState<DetailItem>({
-    school: "",
-    major: "",
-    degree: "",
-    file: undefined,
-  });
+  const portfolioMap: Record<CategoryKey, number> = {
+    education: 1,
+    experience: 2,
+    activity: 3,
+    award: 4,
+    qualification: 5,
+    project: 6,
+    etc: 7,
+  };
 
-  const [experiences, setExperiences] = useState<ExperienceWithKey[]>([]);
+  const portfolioType = portfolioMap[safeCategory];
+
+  const apiMap = {
+    education: { post: postEducations, patch: patchEducations },
+    experience: { post: postExperiences, patch: patchExperiences },
+    activity: { post: postActivities, patch: patchActivities },
+    project: { post: postProjects, patch: patchProjects },
+    award: { post: postAwards, patch: patchAwards },
+    qualification: { post: postCapacities, patch: patchCapacities },
+    etc: { post: postEtc, patch: patchEtc },
+  };
 
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        const eduData = await getPortfolio(1);
-        const expData = await getPortfolio(2);
+        if (safeCategory === "education") {
+          const [eduRes, expRes] = await Promise.all([
+            getPortfolio(1),
+            getPortfolio(2),
+          ]);
 
-        const eduItems = eduData?.item?.items ?? [];
-        if (eduItems.length > 0) {
-          const edu = eduItems[0];
-          setEducation({
-            blockId: edu.blockId,
-            school: String(edu.school ?? ""),
-            major: String(edu.major ?? ""),
-            degree: String(edu.degree ?? ""),
-            file: edu.file ?? null,
-          });
+          const eduItems = eduRes?.item?.items ?? [];
+          const expItems = expRes?.item?.items ?? [];
+
+          setEducation(eduItems[0] ?? defaultItems.education);
+          setExperiences(expItems);
+          return;
         }
 
-        const expItems = expData?.item?.items ?? [];
-        const mapped = expItems.map((exp: any) => ({
-          blockId: exp.blockId,
-          workplace: String(exp.workplace ?? ""),
-          spot: String(exp.spot ?? ""),
-          experienceStartAt: String(exp.experienceStartAt ?? ""),
-          experienceEndAt: String(exp.experienceEndAt ?? ""),
-          file: exp.file ?? null,
-        }));
-        setExperiences(mapped);
+        const data = await getPortfolio(portfolioType);
+        const rawItems = data?.item?.items ?? [];
+
+        if (safeCategory === "etc") {
+          setEtc(rawItems[0] ?? defaultItems.etc);
+        } else {
+          setItems(rawItems);
+        }
       } catch (err) {
         console.error("포트폴리오 조회 실패", err);
       }
     };
 
     fetchPortfolio();
-  }, []);
-
-  const handleEducationChange = (value: DetailItem) => setEducation(value);
-
-  const handleExperienceChange = (index: number, value: DetailItem) => {
-    setExperiences((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, ...value } : item)),
-    );
-  };
-
-  const handleAdd = () => {
-    setExperiences((prev) => [
-      ...prev,
-      {
-        workplace: "",
-        spot: "",
-        experienceStartAt: "",
-        experienceEndAt: "",
-        file: null,
-      },
-    ]);
-  };
-
-  const handleSelectMode = () => {
-    setIsSelectMode(true);
-    setSelectedIds([]);
-  };
+  }, [safeCategory]);
 
   const toggleSelect = (blockId: number) => {
-    if (!blockId) return;
-
     setSelectedIds((prev) =>
       prev.includes(blockId)
         ? prev.filter((id) => id !== blockId)
@@ -114,12 +109,24 @@ export default function DetailPage() {
     try {
       if (selectedIds.length === 0) return;
 
-      await Promise.all(
-        selectedIds.map((blockId) => deletePortfolio(2, blockId)),
-      );
-      setExperiences((prev) =>
-        prev.filter((item) => !selectedIds.includes(item.blockId ?? -1)),
-      );
+      // education 페이지 → experience 삭제
+      if (safeCategory === "education") {
+        await Promise.all(
+          selectedIds.map((blockId) => deletePortfolio(2, blockId)),
+        );
+
+        setExperiences((prev) =>
+          prev.filter((item) => !selectedIds.includes(item.blockId ?? -1)),
+        );
+      } else {
+        await Promise.all(
+          selectedIds.map((blockId) => deletePortfolio(portfolioType, blockId)),
+        );
+
+        setItems((prev) =>
+          prev.filter((item) => !selectedIds.includes(item.blockId ?? -1)),
+        );
+      }
 
       setSelectedIds([]);
       setIsSelectMode(false);
@@ -129,69 +136,68 @@ export default function DetailPage() {
     }
   };
 
-  const isValidDateFormat = (date: string) => {
-    const regex = /^\d{4}-\d{2}-\d{2}$/;
-    return regex.test(date);
+  const handleAdd = () => {
+    if (safeCategory === "education") {
+      setExperiences((prev) => [...prev, defaultItems.experience]);
+    } else if (safeCategory !== "etc") {
+      setItems((prev) => [...prev, defaultItems[safeCategory]]);
+    }
+  };
+  const handleDeleteFile = async (blockId: number) => {
+    try {
+      await deleteAttachment(portfolioType, blockId);
+    } catch (err) {
+      console.error(err);
+      alert("파일 삭제 실패");
+    }
   };
 
   const handleDone = async () => {
-    for (const exp of experiences) {
-      if (
-        (exp.experienceStartAt || exp.experienceEndAt) &&
-        (!isValidDateFormat(String(exp.experienceStartAt)) ||
-          !isValidDateFormat(String(exp.experienceEndAt)))
-      ) {
-        alert("기간은 YYYY-MM-DD 형식으로 입력해주세요.");
-        return;
-      }
-    }
     try {
-      if (education.blockId) {
-        await patchEducations(education.blockId, {
-          school: String(education.school ?? ""),
-          major: String(education.major ?? ""),
-          degree: String(education.degree ?? ""),
-          file: education.file instanceof File ? education.file : null,
-        });
+      if (safeCategory === "education") {
+        if (education) {
+          if (education.blockId) {
+            await patchEducations(education.blockId, education as any);
+          } else {
+            await postEducations(education as any);
+          }
+        }
+
+        await Promise.all(
+          experiences.map(async (exp) => {
+            if (exp.blockId) {
+              await patchExperiences(exp.blockId, exp as any);
+            } else {
+              await postExperiences(exp as any);
+            }
+          }),
+        );
+      } else if (safeCategory === "etc") {
+        if (!etc) return;
+
+        if (etc.blockId) {
+          await patchEtc(etc.blockId, etc as any);
+        } else {
+          await postEtc(etc as any);
+        }
       } else {
-        const res = await postEducations({
-          school: String(education.school ?? ""),
-          major: String(education.major ?? ""),
-          degree: String(education.degree ?? ""),
-          file: education.file instanceof File ? education.file : null,
-        });
-        education.blockId = res.result.blockId;
-        setEducation({ ...education });
+        const { post, patch } = apiMap[safeCategory];
+
+        await Promise.all(
+          items.map(async (item) => {
+            if (item.blockId) {
+              await patch(item.blockId, item as any);
+            } else {
+              await post(item as any);
+            }
+          }),
+        );
       }
 
-      const updated = await Promise.all(
-        experiences.map(async (exp) => {
-          const payload = {
-            workplace: String(exp.workplace ?? ""),
-            spot: String(exp.spot ?? ""),
-            experienceStartAt: String(exp.experienceStartAt ?? ""),
-            experienceEndAt: String(exp.experienceEndAt ?? ""),
-            file: exp.file instanceof File ? exp.file : null,
-          };
-
-          if (exp.blockId) {
-            await patchExperiences(exp.blockId, payload);
-            return exp;
-          } else {
-            const res = await postExperiences(payload);
-
-            return {
-              ...exp,
-              blockId: res.result.blockId,
-            };
-          }
-        }),
-      );
-
-      setExperiences(updated);
       navigate("/home");
-    } catch (error) {
-      console.error("저장 실패", error);
+    } catch (err) {
+      console.error("저장 실패", err);
+      alert("저장에 실패했습니다.");
     }
   };
 
@@ -201,46 +207,76 @@ export default function DetailPage() {
 
       <S.DoneTrashContainer>
         <S.DoneBox onClick={handleDone}>완료</S.DoneBox>
+
         {!isSelectMode ? (
-          <S.DoneBox onClick={handleSelectMode}>선택</S.DoneBox>
+          <S.DoneBox onClick={() => setIsSelectMode(true)}>선택</S.DoneBox>
         ) : (
           <S.TrashBox>
-            <Trash
-              onClick={handleDeleteSelected}
-              style={{ cursor: "pointer" }}
-            />
+            <Trash onClick={handleDeleteSelected} />
           </S.TrashBox>
         )}
       </S.DoneTrashContainer>
 
       <S.FormContainer>
-        {safeCategory === "education" && (
+        {safeCategory === "education" && education && (
           <>
             <DetailForm
               category="education"
               value={education}
-              isEditing={isEditing}
-              onChange={handleEducationChange}
+              isEditing
+              onChange={(v) => setEducation(v)}
             />
+
             {experiences.map((item, index) => (
               <DetailForm
-                key={item.blockId ?? index}
+                key={item.blockId ?? `exp-${index}`}
                 category="experience"
                 value={item}
-                isEditing={isEditing}
+                isEditing
                 isSelectMode={isSelectMode}
                 isSelected={selectedIds.includes(item.blockId ?? -1)}
                 onToggleSelect={() =>
                   item.blockId && toggleSelect(item.blockId)
                 }
-                onChange={(v) => handleExperienceChange(index, v)}
+                onChange={(v) =>
+                  setExperiences((prev) =>
+                    prev.map((it, i) => (i === index ? v : it)),
+                  )
+                }
               />
             ))}
           </>
         )}
+
+        {safeCategory === "etc" && etc && (
+          <DetailForm
+            category="etc"
+            value={etc}
+            isEditing
+            onChange={(v) => setEtc(v)}
+          />
+        )}
+
+        {safeCategory !== "education" &&
+          safeCategory !== "etc" &&
+          items.map((item, index) => (
+            <DetailForm
+              key={item.blockId ?? `new-${index}`}
+              category={safeCategory}
+              value={item}
+              isEditing
+              isSelectMode={isSelectMode}
+              isSelected={selectedIds.includes(item.blockId ?? -1)}
+              onDeleteFile={handleDeleteFile}
+              onToggleSelect={() => item.blockId && toggleSelect(item.blockId)}
+              onChange={(v) =>
+                setItems((prev) => prev.map((it, i) => (i === index ? v : it)))
+              }
+            />
+          ))}
       </S.FormContainer>
 
-      {safeCategory === "education" && (
+      {safeCategory !== "etc" && (
         <S.PlusBox onClick={handleAdd}>
           <Plus style={{ color: "#0086AB" }} />
         </S.PlusBox>
