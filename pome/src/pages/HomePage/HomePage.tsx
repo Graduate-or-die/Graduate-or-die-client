@@ -6,21 +6,21 @@ import HomeBadge from "../../components/HomeBadge";
 import * as S from "./HomePage.style";
 import { Star } from "../../icons";
 import { getVisibility } from "../../apis/portfolio";
-
+import { getMyPage } from "../../apis/user";
 export default function HomePage() {
   const [visibilityMap, setVisibilityMap] = useState<Record<number, boolean>>(
     {},
   );
   const [previewMap, setPreviewMap] = useState<Record<number, any[]>>({});
-
+  const [tags, setTags] = useState<string[]>([]);
   useEffect(() => {
     const fetchVisibility = async () => {
       try {
         const res = await getVisibility();
-        
+
         const map: Record<number, boolean> = {};
         const preview: Record<number, any[]> = {};
-        
+
         res.visibility.forEach((v: any) => {
           map[v.typeId] = v.visible;
         });
@@ -37,6 +37,19 @@ export default function HomePage() {
     };
 
     fetchVisibility();
+  }, []);
+
+  useEffect(() => {
+    const fetchMyPage = async () => {
+      try {
+        const result = await getMyPage();
+        setTags(result.tags || []);
+      } catch (error) {
+        console.error("마이페이지 조회 실패", error);
+      }
+    };
+
+    fetchMyPage();
   }, []);
 
   const handleVisibilityChange = (typeId: number, visible: boolean) => {
@@ -67,8 +80,11 @@ export default function HomePage() {
               <Star />
               AI 기반 생성 태그
             </S.AiTagBox>
-            <HomeBadge label="#대회마스터" />
-            <HomeBadge label="#프론트엔드개발자" />
+            {tags.length > 0 ? (
+              tags.map((tag, index) => <HomeBadge key={index} label={tag} />)
+            ) : (
+              <span>태그 없음</span>
+            )}
           </S.AiTagContainer>
         </S.CenterWrapper>
       </S.ContentWrapper>
