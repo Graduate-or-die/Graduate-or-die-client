@@ -1,4 +1,4 @@
-import React, { useState, memo } from "react";
+import React, { useState, useEffect, memo } from "react";
 import * as S from "./Menu.style";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -10,55 +10,69 @@ import {
 } from "../../icons";
 import { CategoryKey } from "../../constants/categories";
 import { useNavigate } from "react-router-dom";
+import { postVisibility } from "../../apis/portfolio";
+
+const CATEGORY_TYPE_ID = {
+  education: 1,
+  experience: 2,
+  activity: 3,
+  award: 4,
+  qualification: 5,
+  project: 6,
+  etc: 7,
+} as const;
 
 interface MenuSectionProps {
   title: string;
+  typeIds: number[];
   category: CategoryKey[];
-  items?: Record<string, any>[];
-  data: Record<CategoryKey, Record<string, any>[]>;
   basePath: "home" | "mate" | "my";
   isOwner?: boolean;
   isPublic: boolean;
+  previewMap: Record<number, any[]>;
+  onToggleVisibility: (typeId: number, visible: boolean) => void;
 }
+
 interface MenuProps {
-  data: Record<CategoryKey, Record<string, any>[]>;
+  previewMap: Record<number, any[]>;
   basePath: "home" | "mate" | "my";
   isOwner: boolean;
+  visibilityMap: Record<number, boolean>;
+  onToggleVisibility: (typeId: number, visible: boolean) => void;
 }
-const MENU_DISPLAY_FIELDS: Partial<
-  Record<CategoryKey, (item: Record<string, any>) => string>
-> = {
-  education: (item) => `${item.school} | ${item.major} | ${item.degree}`,
-
-  experience: (item) =>
-    `${item.place} | ${item.state} | ${item.periodStart} ~ ${item.periodEnd}`,
-
-  activity: (item) => `${item.name} | ${item.period}`,
-
-  award: (item) => `${item.title} | ${item.grade} | ${item.organization}`,
-
-  qualification: (item) => `${item.name} | ${item.issuer}`,
-
-  project: (item) => `${item.name} | ${item.role}`,
-};
-const renderItem = (item: Record<string, any>, category: CategoryKey) => {
-  return MENU_DISPLAY_FIELDS[category]?.(item) ?? "";
-};
 
 const MenuSection = memo(
   ({
     title,
-    items,
+    typeIds,
     category,
-    data,
     basePath,
     isOwner,
     isPublic,
+    previewMap,
+    onToggleVisibility,
   }: MenuSectionProps) => {
     const [isToggleOpen, setIsToggleOpen] = useState(false);
-    const [isSwitchOpen, setIsSwitchOpen] = useState(true);
+    const [isSwitchOpen, setIsSwitchOpen] = useState(isPublic);
     const navigate = useNavigate();
-    if (!isPublic && !isOwner) {
+
+    useEffect(() => {
+      setIsSwitchOpen(isPublic);
+    }, [isPublic]);
+
+    const handleToggle = async (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      try {
+        const res = await postVisibility(typeIds[0]);
+        setIsSwitchOpen(res.visible);
+        onToggleVisibility(typeIds[0], res.visible);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (!isPublic && (!isOwner || basePath === "my")) {
       return (
         <S.LockedContainer>
           <S.MenuHeader>
@@ -72,13 +86,14 @@ const MenuSection = memo(
         </S.LockedContainer>
       );
     }
+
     const goToDetail = () => {
-      navigate(`/${basePath}/detail/${category[0]}`, {
-        state: {
-          from: basePath,
-        },
-      });
+      navigate(`/${basePath}/detail/${category[0]}`);
     };
+
+    const mergedItems = typeIds.flatMap((id) => previewMap[id] || []);
+    console.log("mergedItems", mergedItems);
+    console.log("previewMap", previewMap);
     return (
       <S.MenuContainer>
         <S.MenuHeader>
@@ -88,13 +103,9 @@ const MenuSection = memo(
             </S.ToggleBox>
             <span onClick={goToDetail}>{title}</span>
           </S.MenuTitleBox>
+
           {isOwner && basePath !== "my" && (
-            <S.SwitchBox
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsSwitchOpen((p) => !p);
-              }}
-            >
+            <S.SwitchBox onClick={handleToggle}>
               {isSwitchOpen ? <SwitchOn /> : <SwitchOff />}
             </S.SwitchBox>
           )}
@@ -110,29 +121,12 @@ const MenuSection = memo(
             >
               <S.BorderLine />
               <S.Dropdown>
-                {category.map((category) => {
-                  const items = data[category];
-
-                  if (!items || items.length === 0) return null;
-
-                  // etc 전용 처리
-                  if (category === "etc") {
-                    return items.flatMap((item: Record<string, any>) =>
-                      Array.isArray(item.content)
-                        ? item.content.map((link: string) => (
-                            <S.DropBox key={`etc-${link}`}>• {link}</S.DropBox>
-                          ))
-                        : [],
-                    );
-                  }
-
-                  // 일반 category
-                  return items.map((item: Record<string, any>) => (
-                    <S.DropBox key={`${category}-${item.id}`}>
-                      • {renderItem(item, category)}
-                    </S.DropBox>
-                  ));
-                })}
+                {mergedItems.map((item, index) => (
+                  <S.DropBox key={`${item.id}-${index}`}>
+                    • {item.title}
+                    {item.awardGrade && ` | ${item.awardGrade}`}
+                  </S.DropBox>
+                ))}
               </S.Dropdown>
             </motion.div>
           )}
@@ -142,67 +136,79 @@ const MenuSection = memo(
   },
 );
 
-export default function Menu({ data, basePath, isOwner }: MenuProps) {
+export default function Menu({
+  previewMap,
+  basePath,
+  isOwner,
+  visibilityMap,
+  onToggleVisibility,
+}: MenuProps) {
   return (
     <>
       <MenuSection
         title="학력/경력"
+        typeIds={[1, 2]}
         category={["education", "experience"]}
-        data={data}
-        items={data.education}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={visibilityMap[1] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
 
       <MenuSection
         title="대·내외 활동"
+        typeIds={[3]}
         category={["activity"]}
-        data={data}
-        items={data.activity}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={visibilityMap[3] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
 
       <MenuSection
         title="수상경력"
+        typeIds={[4]}
         category={["award"]}
-        data={data}
-        items={data.award}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={visibilityMap[4] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
 
       <MenuSection
         title="자격증"
+        typeIds={[5]}
         category={["qualification"]}
-        data={data}
-        items={data.qualification}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={visibilityMap[5] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
 
       <MenuSection
         title="프로젝트"
+        typeIds={[6]}
         category={["project"]}
-        data={data}
-        items={data.project}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={true}
+        isPublic={visibilityMap[6] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
 
       <MenuSection
         title="기타"
+        typeIds={[7]}
         category={["etc"]}
-        data={data}
-        items={data.etc}
         basePath={basePath}
         isOwner={isOwner}
-        isPublic={false}
+        isPublic={visibilityMap[7] ?? true}
+        previewMap={previewMap}
+        onToggleVisibility={onToggleVisibility}
       />
     </>
   );
