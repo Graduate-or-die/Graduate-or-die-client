@@ -20,6 +20,7 @@ export const patchRejectMate = async (mateId: number) => {
   const res = await jsonAxios.patch(`/mates/requests/${mateId}`);
   return res.data;
 };
+
 export const getMateProfile = async () => {
   const res = await jsonAxios.get("/mates/profile");
   return res.data.result;
@@ -27,4 +28,8 @@ export const getMateProfile = async () => {
 export const getMateExists = async () => {
   const res = await jsonAxios.get("/mates/exists");
   return res.data.result;
+};
+export const deleteMate = async () => {
+  const res = await jsonAxios.delete(`/mates`);
+  return res.data;
 };

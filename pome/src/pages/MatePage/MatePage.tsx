@@ -7,6 +7,7 @@ import { DefaultProfile } from "../../assets";
 import { HeartOn, HeartOff, SwitchOn } from "../../icons";
 import { getMateProfile } from "../../apis/mate";
 
+import { deleteMate } from "../../apis/mate";
 export default function MatePage() {
   const [mateInfo, setMateInfo] = useState<any>(null);
   const [isHearted, setIsHearted] = useState(false);
@@ -20,6 +21,7 @@ export default function MatePage() {
     }
     setIsHearted((prev) => !prev);
   };
+
 
   useEffect(() => {
     const fetchMate = async () => {
@@ -37,6 +39,18 @@ export default function MatePage() {
 
   if (!mateInfo) return <div>로딩중...</div>;
 
+  const handleDeleteMate = async () => {
+    const confirm = window.confirm("정말 메이트를 해제하시겠습니까?");
+    if (!confirm) return;
+
+    try {
+      await deleteMate();
+      alert("메이트가 해제되었습니다.");
+    } catch (error) {
+      console.error(error);
+      alert("메이트 해제에 실패했습니다.");
+    }
+  };
   return (
     <>
       <Header />
@@ -100,6 +114,9 @@ export default function MatePage() {
           <S.InfoDetailContainer>
             <S.InfoBox1>희망 직무</S.InfoBox1>
             <S.InfoBox2>{mateInfo.job}</S.InfoBox2>
+          </S.InfoDetailContainer>
+          <S.InfoDetailContainer>
+            <S.DeleteBox onClick={handleDeleteMate}>메이트 해제</S.DeleteBox>
           </S.InfoDetailContainer>
         </S.InfoContainer>
       </S.DetailContainer>
