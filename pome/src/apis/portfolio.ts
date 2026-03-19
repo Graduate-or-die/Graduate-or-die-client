@@ -69,6 +69,25 @@ const createFormData = (data: any) => {
   return formData;
 };
 
+export const getVisibility = async () => {
+  const res = await jsonAxios.get("/portfolios/visibility", {
+    params: {
+      limit: 3,
+      typeIds: [1, 2, 3, 4, 5, 6, 7],
+    },
+  });
+
+  return res.data.result;
+};
+
+export const postVisibility = async (typeId: number) => {
+  const res = await jsonAxios.post("/portfolios/visibility", null, {
+    params: { typeId },
+  });
+
+  return res.data.result;
+};
+
 export const getPortfolio = async (typeId: number) => {
   const res = await formDataAxios.get("/portfolios", {
     params: { typeId },

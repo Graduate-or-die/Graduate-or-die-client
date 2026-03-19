@@ -33,3 +33,13 @@ export const deleteMate = async () => {
   const res = await jsonAxios.delete(`/mates`);
   return res.data;
 };
+export const getMateVisibility = async () => {
+  const res = await jsonAxios.get("/mates/visibility", {
+    params: {
+      limit: 3,
+      typeIds: [1, 2, 3, 4, 5, 6, 7],
+    },
+  });
+
+  return res.data.result;
+};
