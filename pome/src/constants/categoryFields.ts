@@ -23,7 +23,7 @@ export const CATEGORY_FIELDS: Record<CategoryKey, Field[]> = {
   activity: [
     { name: "activityName", label: "활동명" },
     { name: "activityRole", label: "역할" },
-    { name: "activityperiod", label: "기간", kind: "period" },
+    { name: "activityPeriod", label: "기간", kind: "period" },
     { name: "result", label: "성과", kind: "textarea" },
   ],
   award: [
