@@ -5,6 +5,7 @@ import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
 import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
 import { EtcItem, DetailItem } from "../../types/detail";
 import { hasComment } from "../../constants/comments";
+import { getFileDownload } from "../../apis/portfolio";
 
 export type DetailFormProps = {
   category: CategoryKey;
@@ -48,6 +49,7 @@ export default function DetailForm({
   const links =
     isEtcItem(safeValue) && Array.isArray(safeValue.link) ? safeValue.link : [];
   const visibleLinkCount = links.filter((l) => l.trim() !== "").length;
+  const attachmentId = (safeValue as any).file?.fileId;
 
   useEffect(() => {
     const file = (safeValue as any).file;
@@ -57,7 +59,7 @@ export default function DetailForm({
   const getFieldValue = (name: string) => (safeValue as any)[name] ?? "";
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value: inputValue } = e.target;
     onChange?.({ ...safeValue, [name]: inputValue } as DetailItem);
@@ -82,6 +84,26 @@ export default function DetailForm({
     onChange?.({ ...safeValue, file: null } as DetailItem);
   };
 
+  const handleDownload = async (attachmentId: number, fileName: string) => {
+    try {
+      const res = await getFileDownload(attachmentId);
+
+      const blob = new Blob([res.data]);
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("파일 다운로드 실패", error);
+    }
+  };
+
   const toggleExpr = (fieldName: string) => {
     if (!isEditing) return;
 
@@ -91,7 +113,9 @@ export default function DetailForm({
     const updatedValue: any = {
       ...safeValue,
       hasQualificationEndAt: newHasEndAt,
-      qualificationEndAt: newHasEndAt ? getFieldValue("qualificationEndAt") : null,
+      qualificationEndAt: newHasEndAt
+        ? getFieldValue("qualificationEndAt")
+        : null,
     };
 
     onChange?.(updatedValue);
@@ -159,10 +183,19 @@ export default function DetailForm({
       />
       <S.FileContainer>
         <S.FileNameBox
-          value={fileName}
-          placeholder="파일을 첨부하세요"
-          readOnly
-        />
+          onClick={() => {
+            if (!isEditing) return;
+            if (!fileName && fileRef.current) {
+              fileRef.current.click();
+              return;
+            }
+            if (fileName && attachmentId) {
+              handleDownload(attachmentId, fileName);
+            }
+          }}
+        >
+          {fileName || "파일을 첨부하세요"}
+        </S.FileNameBox>
         {fileName && (category === "qualification" || category === "award") && (
           <S.DeleteBox onClick={handleFileDelete}>
             <Delete />
@@ -207,7 +240,6 @@ export default function DetailForm({
     <>
       {isEtcItem(safeValue) &&
         links.map((link, index) => {
-          if (link.trim() === "") return null;
           return (
             <S.LinkContainer key={index}>
               <S.LinkIcon>
@@ -237,7 +269,9 @@ export default function DetailForm({
     const inputValue = getFieldValue(field.name);
     const showRedDot = isMyPage && hasComment(category, field.name, value?.id);
 
-    const isDisabled = !isEditing || (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
+    const isDisabled =
+      !isEditing ||
+      (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
 
     return (
       <S.FormRow key={field.name}>

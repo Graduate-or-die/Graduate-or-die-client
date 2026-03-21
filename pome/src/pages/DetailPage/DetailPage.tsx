@@ -109,7 +109,6 @@ export default function DetailPage() {
     try {
       if (selectedIds.length === 0) return;
 
-      // education 페이지 → experience 삭제
       if (safeCategory === "education") {
         await Promise.all(
           selectedIds.map((blockId) => deletePortfolio(2, blockId)),

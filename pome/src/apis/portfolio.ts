@@ -3,14 +3,12 @@ export interface EducationRequest {
   school: string;
   major: string;
   degree: string;
-  file?: File | null;
 }
 export interface ExperienceRequest {
   workplace: string;
   spot: string;
   experienceStartAt: string;
   experienceEndAt: string;
-  file?: File | null;
 }
 export interface ActivityRequest {
   activityName: string;
@@ -18,7 +16,6 @@ export interface ActivityRequest {
   activityStartAt: string;
   activityEndAt: string;
   result: string;
-  file?: File | null;
 }
 export interface ProjectRequest {
   projectName: string;
@@ -27,7 +24,6 @@ export interface ProjectRequest {
   projectRole: string;
   projectDescription: string;
   projectAward: string;
-  file?: File | null;
 }
 export interface AwardRequest {
   awardName: string;
@@ -50,7 +46,6 @@ export interface QualificationRequest {
 export interface EtcRequest {
   link?: string;
   memo: string;
-  file?: File | null;
 }
 
 const createFormData = (data: any) => {
@@ -104,10 +99,7 @@ export const deletePortfolio = async (typeId: number, blockId: number) => {
 
 // 학력 API
 export const postEducations = async (data: EducationRequest) => {
-  const res = await formDataAxios.post(
-    "/portfolios/educations",
-    createFormData(data),
-  );
+  const res = await jsonAxios.post("/portfolios/educations", data);
   return res.data;
 };
 
@@ -115,19 +107,16 @@ export const patchEducations = async (
   blockId: number,
   data: EducationRequest,
 ) => {
-  const res = await formDataAxios.patch(
-    `/portfolios/educations/${blockId}`,
-    createFormData(data),
-  );
+  const res = await jsonAxios.patch("/portfolios/educations", {
+    blockId,
+    ...data,
+  });
   return res.data;
 };
 
 // 경력 API
 export const postExperiences = async (data: ExperienceRequest) => {
-  const res = await formDataAxios.post(
-    "/portfolios/experiences",
-    createFormData(data),
-  );
+  const res = await jsonAxios.post("/portfolios/experiences", data);
   return res.data;
 };
 
@@ -135,45 +124,30 @@ export const patchExperiences = async (
   blockId: number,
   data: ExperienceRequest,
 ) => {
-  const res = await formDataAxios.patch(
-    `/portfolios/experiences/${blockId}`,
-    createFormData(data),
-  );
+  const res = await jsonAxios.patch(`/portfolios/experiences/${blockId}`, data);
   return res.data;
 };
 
 // 대내외활동 API
 export const postActivities = async (data: ActivityRequest) => {
-  const res = await formDataAxios.post(
-    "/portfolios/activities",
-    createFormData(data),
-  );
+  const res = await jsonAxios.post("/portfolios/activities", data);
   return res.data;
 };
 export const patchActivities = async (
   blockId: number,
   data: ActivityRequest,
 ) => {
-  const res = await formDataAxios.patch(
-    `/portfolios/activities/${blockId}`,
-    createFormData(data),
-  );
+  const res = await jsonAxios.patch(`/portfolios/activities/${blockId}`, data);
   return res.data;
 };
 
 // 프로젝트 API
 export const postProjects = async (data: ProjectRequest) => {
-  const res = await formDataAxios.post(
-    "/portfolios/projects",
-    createFormData(data),
-  );
+  const res = await jsonAxios.post("/portfolios/projects", data);
   return res.data;
 };
 export const patchProjects = async (blockId: number, data: ProjectRequest) => {
-  const res = await formDataAxios.patch(
-    `/portfolios/projects/${blockId}`,
-    createFormData(data),
-  );
+  const res = await jsonAxios.patch(`/portfolios/projects/${blockId}`, data);
   return res.data;
 };
 
@@ -216,15 +190,12 @@ export const patchCapacities = async (
 
 // 기타 API
 export const postEtc = async (data: EtcRequest) => {
-  const res = await formDataAxios.post("/portfolios/etc", createFormData(data));
+  const res = await jsonAxios.post("/portfolios/etc", data);
   return res.data;
 };
 
 export const patchEtc = async (blockId: number, data: EtcRequest) => {
-  const res = await formDataAxios.patch(
-    `/portfolios/etc/${blockId}`,
-    createFormData(data),
-  );
+  const res = await jsonAxios.patch(`/portfolios/etc/${blockId}`, data);
   return res.data;
 };
 
@@ -237,4 +208,11 @@ export const deleteAttachment = async (typeId: number, blockId: number) => {
   });
 
   return res.data;
+};
+
+export const getFileDownload = async (attachmentId: number) => {
+  const res = await jsonAxios.get(`/files/portfolio/${attachmentId}`, {
+    responseType: "blob",
+  });
+  return res;
 };
