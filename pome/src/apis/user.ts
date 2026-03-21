@@ -41,3 +41,13 @@ export const getUserSearch = async (name: string) => {
 
   return res.data;
 };
+
+export const postUserLike = async (mateId: number) => {
+  const res = await jsonAxios.post(`/users/likes/${mateId}`);
+  return res.data.result;
+};
+
+export const deleteUserLike = async (mateId: number) => {
+  const res = await jsonAxios.delete(`/users/likes/${mateId}`);
+  return res.data.result;
+};
