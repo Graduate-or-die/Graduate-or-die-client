@@ -39,11 +39,30 @@ export const RecommendContainer = styled.div`
   margin-bottom: 100px;
   position: relative;
 `;
+export const TopContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 10px 0 15px;
+`;
+export const PercentBox = styled.div`
+  display: flex;
+  align-items: center;
+`;
+export const PercentValue = styled.div`
+  width: 110px;
+  height: 24px;
+  color: #097795;
+  font-family: Inter;
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+`;
 export const HeartBox = styled.div`
   width: 60px;
   display: flex;
   gap: 7px;
-  margin: 20px 26px 0 240px;
 `;
 export const HeartCounter = styled.div`
   color: #5b5b5b;

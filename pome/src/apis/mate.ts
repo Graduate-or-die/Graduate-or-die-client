@@ -57,3 +57,7 @@ export const getMateVisibility = async () => {
 
   return res.data.result;
 };
+export const getMatching = async () => {
+  const res = await jsonAxios.get("/matching");
+  return res.data.result.users;
+};
