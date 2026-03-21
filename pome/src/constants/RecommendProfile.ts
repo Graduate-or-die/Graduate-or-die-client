@@ -8,6 +8,7 @@ export interface RecommendProfile {
   tags: string[];
   aiSummary: string;
   heartCount: number;
+  liked: boolean;
 }
 
 export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
@@ -21,6 +22,7 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     aiSummary:
       "학회장, 프론트엔드 담당 프로젝트 3개, 해커톤 수상 4개, 직무 관련 자격증 소지",
     heartCount: 57,
+    liked: false,
   },
   {
     userId: 2,
@@ -32,6 +34,7 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     aiSummary:
       "프론트엔드 담당 프로젝트 4개, 해커톤 수상 2개, 직무 관련 자격증 소지",
     heartCount: 47,
+    liked: false,
   },
   {
     userId: 3,
@@ -43,6 +46,7 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     aiSummary:
       "인턴 경험, 프론트엔드 담당 프로젝트 3개, 해커톤 수상 4개, 직무 관련 자격증 소지",
     heartCount: 37,
+    liked: false,
   },
   {
     userId: 4,
@@ -54,6 +58,7 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     aiSummary:
       "부회장, 프론트엔드 담당 프로젝트 3개, 해커톤 수상 3개, 직무 관련 자격증 소지",
     heartCount: 27,
+    liked: false,
   },
   {
     userId: 5,
@@ -65,5 +70,6 @@ export const RECOMMEND_DEFAULT_LIST: RecommendProfile[] = [
     aiSummary:
       "프론트엔드 담당 프로젝트 2개, 해커톤 수상 5개, 직무 관련 자격증 소지,프론트엔드 담당 프로젝트 2개, 해커톤 수상 5개, 직무 관련 자격증 소지",
     heartCount: 17,
+    liked: false,
   },
 ];
