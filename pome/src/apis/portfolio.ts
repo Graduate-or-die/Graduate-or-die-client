@@ -209,3 +209,10 @@ export const deleteAttachment = async (typeId: number, blockId: number) => {
 
   return res.data;
 };
+
+export const getFileDownload = async (attachmentId: number) => {
+  const res = await jsonAxios.get(`/files/portfolio/${attachmentId}`, {
+    responseType: "blob",
+  });
+  return res;
+};

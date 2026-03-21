@@ -82,6 +82,7 @@ export const CheckBox = styled.div`
   height: 11px;
   border-radius: 1px;
   border: 0.5px solid #5b5b5b;
+  cursor: pointer;
 `;
 
 export const CheckFont = styled.div`
@@ -141,7 +142,7 @@ export const FileContainer = styled.div`
 export const FileBox = styled.input`
   display: none;
 `;
-export const FileNameBox = styled.input`
+export const FileNameBox = styled.div`
   width: 269px;
   background: none;
   height: 30px;
@@ -156,6 +157,7 @@ export const FileNameBox = styled.input`
   overflow: hidden;
   text-overflow: ellipsis;
   padding: 0 10px 0 5px;
+  cursor: pointer;
 `;
 
 export const LinkContainer = styled.div`
