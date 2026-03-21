@@ -6,6 +6,7 @@ import Badge from "../../components/Badge";
 import { DefaultProfile } from "../../assets";
 import { HeartOn, HeartOff, SwitchOn } from "../../icons";
 import { getMateProfile, deleteMate, getProfileImage } from "../../apis/mate";
+import { postUserLike, deleteUserLike } from "../../apis/user";
 
 export default function MatePage() {
   const [mateInfo, setMateInfo] = useState<any>(null);
@@ -13,9 +14,20 @@ export default function MatePage() {
   const [heartCount, setHeartCount] = useState(0);
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const handleHeartClick = () => {
-    setIsHearted((prev) => !prev);
-    setHeartCount((prev) => (isHearted ? prev - 1 : prev + 1));
+  const handleHeartClick = async () => {
+    try {
+      if (isHearted) {
+        const res = await deleteUserLike(mateInfo.userId);
+        setIsHearted(false);
+        setHeartCount(res.likeCount);
+      } else {
+        const res = await postUserLike(mateInfo.userId);
+        setIsHearted(true);
+        setHeartCount(res.likeCount);
+      }
+    } catch (e) {
+      console.error("좋아요 처리 실패", e);
+    }
   };
 
   useEffect(() => {
@@ -33,7 +45,6 @@ export default function MatePage() {
         } else {
           setProfileImage(null);
         }
-
       } catch (e) {
         console.error("메이트 조회 실패", e);
       }
@@ -117,9 +128,7 @@ export default function MatePage() {
           </S.InfoDetailContainer>
 
           <S.InfoDetailContainer>
-            <S.DeleteBox onClick={handleDeleteMate}>
-              메이트 해제
-            </S.DeleteBox>
+            <S.DeleteBox onClick={handleDeleteMate}>메이트 해제</S.DeleteBox>
           </S.InfoDetailContainer>
         </S.InfoContainer>
       </S.DetailContainer>

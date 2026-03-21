@@ -57,6 +57,14 @@ export const HeartCounter = styled.div`
 export const ProfileImageBox = styled.div`
   display: flex;
   margin: 0 80px 20px;
+  justify-content: center;
+
+  img {
+    width: 154px;
+    height: 154px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 `;
 export const NickNameBox = styled.div`
   color: #313334;
@@ -84,7 +92,7 @@ export const SlideIcon = styled.div``;
 export const InfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin-bottom:20px;
+  margin-bottom: 20px;
   gap: 15px;
 `;
 export const InfoBox = styled.div`

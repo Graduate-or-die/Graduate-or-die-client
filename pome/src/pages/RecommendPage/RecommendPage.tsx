@@ -3,16 +3,19 @@ import * as S from "./RecommendPage.style";
 import RecommendHeader from "../../components/RecommendHeader";
 import TabBar from "../../components/TabBar";
 import { RECOMMEND_DEFAULT_LIST } from "../../constants/RecommendProfile";
-import { HeartOn, Search, SlideLeft, SlideRight } from "../../icons";
+import { HeartOn, HeartOff, Search, SlideLeft, SlideRight } from "../../icons";
 import { DefaultProfile } from "../../assets";
 import Badge from "../../components/Badge";
-import { getUserSearch } from "../../apis/user";
-import { postRequestMate } from "../../apis/mate";
+import { getUserSearch, postUserLike, deleteUserLike } from "../../apis/user";
+import { postRequestMate, getProfileImage } from "../../apis/mate";
+
 export default function RecommendPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [searchValue, setSearchValue] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [searchProfile, setSearchProfile] = useState<any | null>(null);
+  const [isHearted, setIsHearted] = useState(false);
+  const [heartCount, setHeartCount] = useState(0);
 
   useEffect(() => {
     if (searchValue === "") {
@@ -25,6 +28,13 @@ export default function RecommendPage() {
   const currentProfile = isSearching
     ? searchProfile
     : RECOMMEND_DEFAULT_LIST[currentIndex];
+
+  useEffect(() => {
+    if (currentProfile) {
+      setHeartCount(currentProfile.heartCount || 0);
+      setIsHearted(currentProfile.liked || false);
+    }
+  }, [currentProfile]);
 
   const handleNext = () => {
     setIsSearching(false);
@@ -41,17 +51,21 @@ export default function RecommendPage() {
   const handleSearch = async () => {
     try {
       const res = await getUserSearch(searchValue.trim());
-      console.log("검색 결과:", res);
       const user = res.result;
+      let profileImageUrl = null;
 
+      if (user.profileImage) {
+        profileImageUrl = await getProfileImage(user.userId);
+      }
       setSearchProfile({
         userId: user.userId,
         nickname: user.nickName,
         job: user.job || "직무 정보 없음",
         introduction: user.introduction || "자기소개 없음",
         tags: user.tags || [],
-        profileImageUrl: user.profileImage,
+         profileImageUrl, 
         heartCount: user.likeCount || 0,
+        liked: user.liked || false,
       });
 
       setIsSearching(true);
@@ -60,6 +74,7 @@ export default function RecommendPage() {
       console.error(err);
     }
   };
+
   const handleMatchRequest = async () => {
     try {
       await postRequestMate(currentProfile.userId);
@@ -67,6 +82,22 @@ export default function RecommendPage() {
     } catch (err) {
       console.error(err);
       alert("이미 신청을 보냈습니다.");
+    }
+  };
+
+  const handleHeartClick = async () => {
+    try {
+      if (isHearted) {
+        const res = await deleteUserLike(currentProfile.userId);
+        setIsHearted(false);
+        setHeartCount(res.likeCount);
+      } else {
+        const res = await postUserLike(currentProfile.userId);
+        setIsHearted(true);
+        setHeartCount(res.likeCount);
+      }
+    } catch (e) {
+      console.error("좋아요 실패", e);
     }
   };
 
@@ -86,9 +117,9 @@ export default function RecommendPage() {
         <Search onClick={handleSearch} />
       </S.SearchContainer>
       <S.RecommendContainer>
-        <S.HeartBox>
-          <HeartOn />
-          <S.HeartCounter>{currentProfile.heartCount}</S.HeartCounter>
+        <S.HeartBox onClick={handleHeartClick} style={{ cursor: "pointer" }}>
+          {isHearted ? <HeartOn /> : <HeartOff />}
+          <S.HeartCounter>{heartCount}</S.HeartCounter>
         </S.HeartBox>
         <S.ProfileImageBox>
           {currentProfile.profileImageUrl ? (
