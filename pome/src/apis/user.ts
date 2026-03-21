@@ -9,7 +9,7 @@ export interface PatchMyPageRequest {
 }
 export const getMyPage = async () => {
   const res = await jsonAxios.get("/users/mypage");
-  return res.data;
+  return res.data.result;
 };
 export const patchMyPage = async (data: PatchMyPageRequest, files?: File[]) => {
   const formData = new FormData();
@@ -23,7 +23,7 @@ export const patchMyPage = async (data: PatchMyPageRequest, files?: File[]) => {
 
   const res = await formDataAxios.patch("/users/mypage", formData);
 
-  return res.data;
+  return res.data.result;
 };
 export const getProfile = async () => {
   const res = await jsonAxios.get("/files/profile", {

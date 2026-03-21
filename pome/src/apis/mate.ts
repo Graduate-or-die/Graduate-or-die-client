@@ -20,6 +20,29 @@ export const patchRejectMate = async (mateId: number) => {
   const res = await jsonAxios.patch(`/mates/requests/${mateId}`);
   return res.data;
 };
+
+export const getMateProfile = async () => {
+  const res = await jsonAxios.get("/mates/profile");
+  return res.data.result;
+};
+export const getMateExists = async () => {
+  const res = await jsonAxios.get("/mates/exists");
+  return res.data.result;
+};
+export const getProfileImage = async (userId: number) => {
+  try {
+    const res = await jsonAxios.get(`/files/profile/${userId}`, {
+      responseType: "blob",
+    });
+
+    return URL.createObjectURL(res.data);
+  } catch (error: any) {
+    if (error.response?.status === 404 || error.response?.data?.code === 2116) {
+      return null;
+    }
+    return null;
+  }
+};
 export const deleteMate = async () => {
   const res = await jsonAxios.delete(`/mates`);
   return res.data;
