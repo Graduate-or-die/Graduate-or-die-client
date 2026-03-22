@@ -3,14 +3,17 @@ import * as S from "./MateInactivePage.style";
 import TabBar from "../../components/TabBar";
 import { PomeOff } from "../../icons";
 type Props = {
-  variant: "chat" | "mate";
+  variant: "chat" | "mate" | "noMate";
 };
 const CONTENT = {
   chat: {
-    title: "채팅을 사용할 수 없어요\n설정에서 활성화해 보세요.",
+    title: "채팅을 사용할 수 없어요.\n매칭을 활성화해 주세요.",
   },
   mate: {
-    title: "김혜림님은 메이트 비활성화 상태예요\n설정에서 활성화해 보세요.",
+    title: "메이트 비활성화 상태예요.\n매칭을 활성화해 주세요.",
+  },
+  noMate: {
+    title: "아직 매칭된 메이트가 없어요.\n메이트를 찾아보세요.",
   },
 };
 export default function MateInactivePage({ variant }: Props) {
