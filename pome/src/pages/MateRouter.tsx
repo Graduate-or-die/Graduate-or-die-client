@@ -14,14 +14,11 @@ export default function MateRouter() {
   const fetchData = async () => {
     try {
       const myPage = await getMyPage();
-      console.log("🔥 matching:", myPage.matching);
 
       setMatching(myPage.matching);
 
       if (myPage.matching) {
         const mate = await getMateExists();
-        console.log("🔥 mateExists:", mate);
-
         setIsMatched(mate);
       } else {
         setIsMatched(false);
