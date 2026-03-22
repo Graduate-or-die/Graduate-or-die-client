@@ -92,8 +92,6 @@ const MenuSection = memo(
     };
 
     const mergedItems = typeIds.flatMap((id) => previewMap[id] || []);
-    console.log("mergedItems", mergedItems);
-    console.log("previewMap", previewMap);
     return (
       <S.MenuContainer>
         <S.MenuHeader>
