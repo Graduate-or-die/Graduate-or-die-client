@@ -8,16 +8,8 @@ export default function MateDetailForm(props: MateDetailFormProps) {
   const { category, value, isEditing, ...rest } = props;
   const navigate = useNavigate();
 
-  const SINGLE_CATEGORIES: CategoryKey[] = ["education", "etc"];
-
-  const handleFieldClick = (fieldName: string) => {
-    if (!value) return;
-
-    if (SINGLE_CATEGORIES.includes(category)) {
-      navigate(`/mate/detail/${category}/${fieldName}`);
-    } else {
-      navigate(`/mate/detail/${category}/${value.id}/${fieldName}`);
-    }
+  const handleFieldClick = (fieldKey: string, blockId: number) => {
+    navigate(`/mate/detail/${category}/${blockId}/${fieldKey}`);
   };
 
   return (
@@ -26,7 +18,10 @@ export default function MateDetailForm(props: MateDetailFormProps) {
       isEditing={isEditing}
       onChange={() => {}}
       {...rest}
-      onFieldClick={handleFieldClick}
+      onFieldClick={(fieldKey) => {
+        if (!value?.blockId) return;
+        handleFieldClick(fieldKey, value.blockId);
+      }}
       showAttachButton={false}
     />
   );

@@ -29,9 +29,8 @@ export default function App() {
         <Route path="/home/detail/:category" element={<DetailPage />} />
         <Route path="/mate" element={<MateRouter />} />
         <Route path="/mate/detail/:category" element={<MateDetailPage />} />
-        <Route path="/mate/detail/:category/:field" element={<CommentPage />} />
         <Route
-          path="/mate/detail/:category/:id/:field"
+          path="/mate/detail/:category/:blockId/:fieldKey"
           element={<CommentPage />}
         />
         <Route path="/chat" element={<ChatRouter />} />
@@ -39,9 +38,8 @@ export default function App() {
         <Route path="/match" element={<MateMatchPage />} />
         <Route path="/matepage" element={<MatePage />} />
         <Route path="/my/detail/:category" element={<MyDetailPage />} />
-        <Route path="/my/detail/:category/:field" element={<MyCommentPage />} />
         <Route
-          path="/my/detail/:category/:id/:field"
+          path="/my/detail/:category/:blockId/:fieldKey"
           element={<MyCommentPage />}
         />
         <Route path="/auth/callback" element={<KakaoCallbackPage />} />

@@ -275,7 +275,14 @@ export default function DetailForm({
       (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
 
     return (
-      <S.FormRow key={field.name}>
+      <S.FormRow
+        key={field.name}
+        onClick={() => {
+          if (!isEditing) {
+            onFieldClick?.(field.name);
+          }
+        }}
+      >
         <S.FormLabel>
           {field.label}
           {showRedDot && (
