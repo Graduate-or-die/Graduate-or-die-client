@@ -184,7 +184,6 @@ export default function DetailForm({
       <S.FileContainer>
         <S.FileNameBox
           onClick={() => {
-            if (!isEditing) return;
             if (!fileName && fileRef.current) {
               fileRef.current.click();
               return;
@@ -196,11 +195,13 @@ export default function DetailForm({
         >
           {fileName || "파일을 첨부하세요"}
         </S.FileNameBox>
-        {fileName && (category === "qualification" || category === "award") && (
-          <S.DeleteBox onClick={handleFileDelete}>
-            <Delete />
-          </S.DeleteBox>
-        )}
+        {showAttachButton &&
+          fileName &&
+          (category === "qualification" || category === "award") && (
+            <S.DeleteBox onClick={handleFileDelete}>
+              <Delete />
+            </S.DeleteBox>
+          )}
         {showAttachButton && (
           <S.AttachButton
             type="button"
