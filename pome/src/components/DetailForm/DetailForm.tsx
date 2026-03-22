@@ -279,6 +279,7 @@ export default function DetailForm({
         key={field.name}
         onClick={() => {
           if (!isEditing) {
+            if (field.name === "file") return;
             onFieldClick?.(field.name);
           }
         }}
