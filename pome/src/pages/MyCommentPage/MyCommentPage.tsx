@@ -7,6 +7,7 @@ import TabBar from "../../components/TabBar";
 import { CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS } from "../../constants/categoryFields";
 import { getPortfolio } from "../../apis/portfolio";
+import { postCommentList } from "../../apis/comment";
 
 export default function MyCommentPage() {
   const { category, blockId, fieldKey } = useParams<{
@@ -32,6 +33,7 @@ export default function MyCommentPage() {
     project: 6,
     etc: 7,
   };
+  const myUserId = Number(localStorage.getItem("userId"));
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +51,28 @@ export default function MyCommentPage() {
 
     fetchData();
   }, [safeCategory]);
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+
+        const typeId = CATEGORY_TYPE_ID[safeCategory];
+
+        const res = await postCommentList(myUserId, {
+          typeId,
+          blockId: Number(blockId),
+          fieldKey,
+        });
+        console.log(res);
+        setComments(res ?? []);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchComments();
+  }, [myUserId, safeCategory, blockId, fieldKey]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -146,7 +170,7 @@ export default function MyCommentPage() {
                 <S.NoCommentBox>아직 받은 댓글이 없어요.</S.NoCommentBox>
               ) : (
                 comments.map((c) => (
-                  <Comment key={c.id} content={c.content} isReadonly />
+                  <Comment key={c.messageId} content={c.content} isReadonly />
                 ))
               )}
             </S.CommentBox>
