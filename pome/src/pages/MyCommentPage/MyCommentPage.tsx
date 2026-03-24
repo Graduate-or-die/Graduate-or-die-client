@@ -19,7 +19,7 @@ export default function MyCommentPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const [portfolio, setPortfolio] = useState<any[]>([]);
-  const [comments, setComments] = useState<any[]>([]); // 👉 나중에 API 연결
+  const [comments, setComments] = useState<any[]>([]);
 
   const safeCategory = category as CategoryKey;
 
@@ -60,9 +60,7 @@ export default function MyCommentPage() {
     return <div>로딩중...</div>;
   }
 
-  const targetItem = portfolio.find(
-    (item) => item.blockId == Number(blockId),
-  );
+  const targetItem = portfolio.find((item) => item.blockId == Number(blockId));
 
   if (!targetItem) {
     return <div>데이터 없음</div>;
@@ -72,7 +70,6 @@ export default function MyCommentPage() {
     CATEGORY_FIELDS[safeCategory]?.find((f) => f.name === fieldKey)?.label ??
     "정보";
 
-  // 🔥 period 처리 (CommentPage 그대로 가져옴)
   const isPeriodCategory = ["experience", "activity", "project"].includes(
     safeCategory,
   );
@@ -146,12 +143,10 @@ export default function MyCommentPage() {
 
             <S.CommentBox>
               {comments.length === 0 ? (
-                <S.NoCommentBox>
-                  아직 받은 댓글이 없어요.
-                </S.NoCommentBox>
+                <S.NoCommentBox>아직 받은 댓글이 없어요.</S.NoCommentBox>
               ) : (
                 comments.map((c) => (
-                  <Comment key={c.id} content={c.content} readonly />
+                  <Comment key={c.id} content={c.content} isReadonly />
                 ))
               )}
             </S.CommentBox>

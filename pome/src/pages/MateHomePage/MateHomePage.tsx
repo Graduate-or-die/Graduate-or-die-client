@@ -16,8 +16,11 @@ export default function MateHomePage() {
     return location.state?.backTab ?? "mate";
   });
 
-  const [visibilityMap, setVisibilityMap] = useState<Record<number, boolean>>({});
+  const [visibilityMap, setVisibilityMap] = useState<Record<number, boolean>>(
+    {},
+  );
   const [previewMap, setPreviewMap] = useState<Record<number, any[]>>({});
+  const [mateId, setMateId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchVisibility = async () => {
@@ -27,21 +30,23 @@ export default function MateHomePage() {
             ? await getMateVisibility()
             : await getVisibility();
 
+        const data = res;
         const map: Record<number, boolean> = {};
         const preview: Record<number, any[]> = {};
 
-        res.visibility.forEach((v: any) => {
+        data.visibility.forEach((v: any) => {
           map[v.typeId] = v.visible;
         });
 
-        Object.entries(res.previews).forEach(
-          ([typeId, value]: any) => {
-            preview[Number(typeId)] = value.items;
-          }
-        );
+        Object.entries(data.previews).forEach(([typeId, value]: any) => {
+          preview[Number(typeId)] = value.items;
+        });
 
         setVisibilityMap(map);
         setPreviewMap(preview);
+        if (activeTab === "mate") {
+          setMateId(data.mateId);
+        }
       } catch (err) {
         console.error(err);
       }
@@ -85,9 +90,7 @@ export default function MateHomePage() {
                     window.history.replaceState({}, "");
                   }}
                 >
-                  <S.BadgeText $active={activeTab === "my"}>
-                    사용자
-                  </S.BadgeText>
+                  <S.BadgeText $active={activeTab === "my"}>사용자</S.BadgeText>
                 </S.TabBadge>
               </S.BadgeContainer>
               <S.HomeMenu>
@@ -97,9 +100,9 @@ export default function MateHomePage() {
                   isOwner={activeTab === "my"}
                   visibilityMap={visibilityMap}
                   onToggleVisibility={handleVisibilityChange}
+                  mateId={mateId}
                 />
               </S.HomeMenu>
-
             </S.MateHomeWrapper>
           </S.CenterWrapper>
         </S.ContentWrapper>

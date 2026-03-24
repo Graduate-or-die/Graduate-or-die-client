@@ -152,9 +152,13 @@ export default function DetailForm({
     const endValue = getFieldValue(end);
     const startReadOnly = !isEditing || startValue === null;
     const endReadOnly = !isEditing || endValue === null;
-
+    const handleClick = () => {
+      if (!isEditing) {
+        onFieldClick?.(start);
+      }
+    };
     return (
-      <S.PeriodBox>
+      <S.PeriodBox onClick={handleClick}>
         <S.DateBox
           name={start}
           value={startValue ?? ""}
@@ -280,7 +284,13 @@ export default function DetailForm({
         onClick={() => {
           if (!isEditing) {
             if (field.name === "file") return;
-            onFieldClick?.(field.name);
+
+            if (field.kind === "period") {
+              const { start } = getPeriodFieldNames(category);
+              onFieldClick?.(start);
+            } else {
+              onFieldClick?.(field.name);
+            }
           }
         }}
       >

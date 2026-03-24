@@ -6,6 +6,7 @@ import TabBar from "../../components/TabBar";
 import DetailHeader from "../../components/DetailHeader";
 import MateDetailForm from "../../components/MateDetailFrom";
 import { getMatePortfolio } from "../../apis/mate";
+import { useLocation } from "react-router-dom";
 
 export default function MateDetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
@@ -14,6 +15,8 @@ export default function MateDetailPage() {
   const [experiences, setExperiences] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [etc, setEtc] = useState<any | null>(null);
+  const location = useLocation();
+  const mateId = location.state?.mateId;
 
   const portfolioMap: Record<CategoryKey, number> = {
     education: 1,
@@ -24,7 +27,7 @@ export default function MateDetailPage() {
     project: 6,
     etc: 7,
   };
-  
+
   useEffect(() => {
     if (!safeCategory) return;
 
@@ -72,6 +75,7 @@ export default function MateDetailPage() {
                   category="education"
                   value={education}
                   isEditing={false}
+                  mateId={mateId}
                 />
               )}
 
@@ -81,12 +85,18 @@ export default function MateDetailPage() {
                   category="experience"
                   value={item}
                   isEditing={false}
+                  mateId={mateId}
                 />
               ))}
             </>
           )}
           {safeCategory === "etc" && etc && (
-            <MateDetailForm category="etc" value={etc} isEditing={false} />
+            <MateDetailForm
+              category="etc"
+              value={etc}
+              isEditing={false}
+              mateId={mateId}
+            />
           )}
           {safeCategory !== "education" &&
             safeCategory !== "etc" &&
@@ -96,6 +106,7 @@ export default function MateDetailPage() {
                 category={safeCategory}
                 value={item}
                 isEditing={false}
+                mateId={mateId}
               />
             ))}
         </S.FormContainer>
