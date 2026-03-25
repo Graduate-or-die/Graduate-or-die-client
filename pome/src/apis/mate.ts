@@ -61,3 +61,9 @@ export const getMatching = async () => {
   const res = await jsonAxios.get("/matching");
   return res.data.result.users;
 };
+export const getMatePortfolio = async (typeId: number) => {
+  const res = await jsonAxios.get("/mates/portfolio", {
+    params: { typeId },
+  });
+  return res.data.result;
+};

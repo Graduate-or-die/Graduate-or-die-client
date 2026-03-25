@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
+import { Link, Check, SelectCheck, Plus, Delete } from "../../icons";
 import { EtcItem, DetailItem } from "../../types/detail";
 import { hasComment } from "../../constants/comments";
 import { getFileDownload } from "../../apis/portfolio";
@@ -152,9 +152,13 @@ export default function DetailForm({
     const endValue = getFieldValue(end);
     const startReadOnly = !isEditing || startValue === null;
     const endReadOnly = !isEditing || endValue === null;
-
+    const handleClick = () => {
+      if (!isEditing) {
+        onFieldClick?.(start);
+      }
+    };
     return (
-      <S.PeriodBox>
+      <S.PeriodBox onClick={handleClick}>
         <S.DateBox
           name={start}
           value={startValue ?? ""}
@@ -184,7 +188,6 @@ export default function DetailForm({
       <S.FileContainer>
         <S.FileNameBox
           onClick={() => {
-            if (!isEditing) return;
             if (!fileName && fileRef.current) {
               fileRef.current.click();
               return;
@@ -196,11 +199,13 @@ export default function DetailForm({
         >
           {fileName || "파일을 첨부하세요"}
         </S.FileNameBox>
-        {fileName && (category === "qualification" || category === "award") && (
-          <S.DeleteBox onClick={handleFileDelete}>
-            <Delete />
-          </S.DeleteBox>
-        )}
+        {showAttachButton &&
+          fileName &&
+          (category === "qualification" || category === "award") && (
+            <S.DeleteBox onClick={handleFileDelete}>
+              <Delete />
+            </S.DeleteBox>
+          )}
         {showAttachButton && (
           <S.AttachButton
             type="button"
@@ -274,14 +279,24 @@ export default function DetailForm({
       (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
 
     return (
-      <S.FormRow key={field.name}>
+      <S.FormRow
+        key={field.name}
+        onClick={() => {
+          if (!isEditing) {
+            if (field.name === "file") return;
+
+            if (field.kind === "period") {
+              const { start } = getPeriodFieldNames(category);
+              onFieldClick?.(start);
+            } else {
+              onFieldClick?.(field.name);
+            }
+          }
+        }}
+      >
         <S.FormLabel>
           {field.label}
-          {showRedDot && (
-            <S.RedDotBox>
-              <RedDot />
-            </S.RedDotBox>
-          )}
+          {showRedDot && <S.RedDotBox></S.RedDotBox>}
         </S.FormLabel>
 
         {field.kind === "period" ? (

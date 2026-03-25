@@ -31,6 +31,7 @@ interface MenuSectionProps {
   isPublic: boolean;
   previewMap: Record<number, any[]>;
   onToggleVisibility: (typeId: number, visible: boolean) => void;
+  mateId?: number | null;
 }
 
 interface MenuProps {
@@ -39,6 +40,7 @@ interface MenuProps {
   isOwner: boolean;
   visibilityMap: Record<number, boolean>;
   onToggleVisibility: (typeId: number, visible: boolean) => void;
+  mateId?: number | null;
 }
 
 const MenuSection = memo(
@@ -51,6 +53,7 @@ const MenuSection = memo(
     isPublic,
     previewMap,
     onToggleVisibility,
+    mateId,
   }: MenuSectionProps) => {
     const [isToggleOpen, setIsToggleOpen] = useState(false);
     const [isSwitchOpen, setIsSwitchOpen] = useState(isPublic);
@@ -88,7 +91,13 @@ const MenuSection = memo(
     }
 
     const goToDetail = () => {
-      navigate(`/${basePath}/detail/${category[0]}`);
+      if (basePath === "mate" && !mateId) {
+        return;
+      }
+
+      navigate(`/${basePath}/detail/${category[0]}`, {
+        state: basePath === "mate" ? { mateId } : undefined,
+      });
     };
 
     const mergedItems = typeIds.flatMap((id) => previewMap[id] || []);
@@ -140,6 +149,7 @@ export default function Menu({
   isOwner,
   visibilityMap,
   onToggleVisibility,
+  mateId,
 }: MenuProps) {
   return (
     <>
@@ -152,6 +162,7 @@ export default function Menu({
         isPublic={visibilityMap[1] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
 
       <MenuSection
@@ -163,6 +174,7 @@ export default function Menu({
         isPublic={visibilityMap[3] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
 
       <MenuSection
@@ -174,6 +186,7 @@ export default function Menu({
         isPublic={visibilityMap[4] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
 
       <MenuSection
@@ -185,6 +198,7 @@ export default function Menu({
         isPublic={visibilityMap[5] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
 
       <MenuSection
@@ -196,6 +210,7 @@ export default function Menu({
         isPublic={visibilityMap[6] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
 
       <MenuSection
@@ -207,6 +222,7 @@ export default function Menu({
         isPublic={visibilityMap[7] ?? true}
         previewMap={previewMap}
         onToggleVisibility={onToggleVisibility}
+        mateId={mateId}
       />
     </>
   );

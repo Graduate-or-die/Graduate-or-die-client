@@ -1,162 +1,222 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import * as S from "./CommentPage.style";
 import Comment from "../../components/Comment";
 import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS } from "../../constants/categoryFields";
-import { DETAIL_DEFAULT_MATE_CATEGORY } from "../../constants/defaultDetailItem";
 import Input from "../../components/Input";
 import { Etc } from "../../icons";
 import CommentPop from "../../components/CommentPop";
+import { getMatePortfolio } from "../../apis/mate";
+import {
+  postComment,
+  postCommentList,
+  postCommentDelete,
+} from "../../apis/comment";
+
 export default function CommentPage() {
-  const { category, id, field } = useParams<{
+  const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
+    education: 1,
+    experience: 2,
+    activity: 3,
+    award: 4,
+    qualification: 5,
+    project: 6,
+    etc: 7,
+  };
+
+  const { category, blockId, fieldKey } = useParams<{
     category: CategoryKey;
-    id?: string;
-    field: string;
+    blockId: string;
+    fieldKey: string;
   }>();
+
+  const [portfolio, setPortfolio] = useState<any[]>([]);
   const [comments, setComments] = useState<
-    { id: number; content: string; createdAt: string }[]
+    { messageId: number; content: string }[]
   >([]);
   const [comment, setComment] = useState("");
-
   const [selectedCommentIds, setSelectedCommentIds] = useState<number[]>([]);
   const [isPopOpen, setIsPopOpen] = useState(false);
   const [isDeleteMode, setIsDeleteMode] = useState(false);
 
-  const popRef = useRef<HTMLDivElement | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  const safeCategory = category as CategoryKey;
+  const location = useLocation();
+  const mateId = location.state?.mateId;
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [comments]);
 
-  const safeCategory = category as CategoryKey;
+  useEffect(() => {
+    if (!safeCategory) return;
+    const fetchPortfolio = async () => {
+      const typeId = CATEGORY_TYPE_ID[safeCategory];
+      const res = await getMatePortfolio(typeId);
+      setPortfolio(res.item.items || []);
+    };
+    fetchPortfolio();
+  }, [safeCategory]);
 
-  if (!safeCategory) return null;
+  useEffect(() => {
+    if (!mateId || !safeCategory || !blockId || !fieldKey) return;
+    const fetchComments = async () => {
+      const typeId = CATEGORY_TYPE_ID[safeCategory];
+      const res = await postCommentList(mateId, {
+        typeId,
+        blockId: Number(blockId),
+        fieldKey,
+      });
+      setComments(res);
+    };
+    fetchComments();
+  }, [mateId, safeCategory, blockId, fieldKey]);
 
-  const items = DETAIL_DEFAULT_MATE_CATEGORY[safeCategory] ?? [];
-  const targetItem = items.find((item) => item.id === Number(id)) ?? items[0];
+  if (!category || !blockId || !fieldKey) return null;
+  if (portfolio.length === 0) return <div>로딩중...</div>;
 
-  if (!targetItem) return null;
+  const targetItem = portfolio.find((item) => item.blockId == Number(blockId));
+  if (!targetItem) return <div>데이터 없음</div>;
 
-  const fieldLabel = CATEGORY_FIELDS[safeCategory]?.find(
-    (f) => f.name === field,
-  )?.label;
+  const fieldLabel =
+    CATEGORY_FIELDS[safeCategory]?.find((f) => f.name === fieldKey)?.label ??
+    "정보";
 
-  let displayValue: string = "-";
+  const handleAddComment = async (content: string) => {
+    if (!mateId) return;
 
-  if (field === "period") {
-    if (safeCategory === "activity") {
-      displayValue =
-        targetItem.period != null ? String(targetItem.period) : "-";
-    } else {
-      const start = targetItem.periodStart;
-      const end = targetItem.periodEnd;
+    const typeId = CATEGORY_TYPE_ID[safeCategory];
 
-      if (start || end) {
-        displayValue = `${start ?? ""} ~ ${end ?? "현재"}`;
-      }
-    }
-  } else {
-    const raw = targetItem[field as keyof typeof targetItem];
-    displayValue =
-      raw == null ? "-" : Array.isArray(raw) ? raw.join("\n") : String(raw);
-  }
+    await postComment(mateId, {
+      typeId,
+      blockId: Number(blockId),
+      fieldKey,
+      content,
+    });
 
-  const togglePop = () => setIsPopOpen((prev) => !prev);
+    const updated = await postCommentList(mateId, {
+      typeId,
+      blockId: Number(blockId),
+      fieldKey,
+    });
 
-  const handleAddComment = (content: string) => {
-    setComments((prev) => [
-      ...prev,
-      {
-        id: Date.now(),
-        content,
-        createdAt: new Date().toISOString(),
-      },
-    ]);
+    setComments(updated);
     setComment("");
   };
 
-  const handleDeleteAllComments = () => {
-    setComments([]);
+  const handleToggleComment = (id: number) => {
+    setSelectedCommentIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
+    );
+  };
+
+  const handleDeleteComments = async (ids: number[]) => {
+    if (!mateId || ids.length === 0) return;
+
+    const typeId = CATEGORY_TYPE_ID[safeCategory];
+
+    await Promise.all(
+      ids.map((msgId) =>
+        postCommentDelete(mateId, msgId, {
+          typeId,
+          blockId: Number(blockId),
+          fieldKey,
+        }),
+      ),
+    );
+
+    const updated = await postCommentList(mateId, {
+      typeId,
+      blockId: Number(blockId),
+      fieldKey,
+    });
+
+    setComments(updated);
+    setSelectedCommentIds([]);
+    setIsDeleteMode(false);
+    setIsPopOpen(false);
+  };
+
+  const handleDeleteSelectedComments = async () => {
+    if (selectedCommentIds.length === 0) {
+      alert("댓글을 선택하세요");
+      return;
+    }
+    await handleDeleteComments(selectedCommentIds);
+  };
+
+  const handleDeleteAllComments = async () => {
+    const allIds = comments.map((c) => c.messageId);
+    if (allIds.length === 0) return;
+    await handleDeleteComments(allIds);
+  };
+
+  const handleDeleteSelect = () => {
+    setSelectedCommentIds([]);
+    setIsDeleteMode(true);
   };
 
   return (
-    <>
-      <S.PageWrapper>
-        <DetailHeader category={safeCategory} />
-        <S.ContentWrapper>
-          <S.FormContainer>
-            <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>
-            <S.FormBoard>{displayValue}</S.FormBoard>
-          </S.FormContainer>
-          <S.CommentContainer>
-            <S.CommentRow>
-              Comment
-              <S.EtcBox>
-                <Etc onClick={togglePop} />
+    <S.PageWrapper>
+      <DetailHeader category={safeCategory} />
 
-                {isPopOpen && (
-                  <S.Popup ref={popRef}>
-                    <CommentPop
-                      isDeleteMode={isDeleteMode}
-                      onDeleteSelect={() => {
-                        setIsDeleteMode(true);
-                      }}
-                      onConfirmDelete={() => {
-                        setComments((prev) =>
-                          prev.filter(
-                            (comment) =>
-                              !selectedCommentIds.includes(comment.id),
-                          ),
-                        );
-                        setSelectedCommentIds([]);
-                        setIsDeleteMode(false);
-                        setIsPopOpen(false);
-                      }}
-                      onCancelDelete={() => {
-                        setSelectedCommentIds([]);
-                        setIsDeleteMode(false);
-                        setIsPopOpen(false);
-                      }}
-                      onDeleteAll={() => {
-                        handleDeleteAllComments();
-                        setIsPopOpen(false);
-                      }}
-                    />
-                  </S.Popup>
-                )}
-              </S.EtcBox>
-            </S.CommentRow>
-            <S.CommentBox>
-              {comments.map((comment) => (
-                <Comment
-                  key={comment.id}
-                  content={comment.content}
-                  checked={selectedCommentIds.includes(comment.id)}
-                  isDeleteMode={isDeleteMode}
-                  onToggle={() => {
-                    if (!isDeleteMode) return;
-                    setSelectedCommentIds((prev) =>
-                      prev.includes(comment.id)
-                        ? prev.filter((id) => id !== comment.id)
-                        : [...prev, comment.id],
-                    );
-                  }}
-                />
-              ))}
-            </S.CommentBox>
-            <div ref={bottomRef} />
-          </S.CommentContainer>
-        </S.ContentWrapper>
-        <Input
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          placeholder="댓글을 입력하세요."
-          onSubmit={handleAddComment}
-        />
-      </S.PageWrapper>
-    </>
+      <S.ContentWrapper>
+        <S.FormContainer>
+          <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>
+          <S.FormBoard>
+            {targetItem[fieldKey as keyof typeof targetItem] ?? "-"}
+          </S.FormBoard>
+        </S.FormContainer>
+
+        <S.CommentContainer>
+          <S.CommentRow>
+            Comment
+            <S.EtcBox>
+              <Etc onClick={() => setIsPopOpen((prev) => !prev)} />
+              {isPopOpen && (
+                <S.Popup>
+                  <CommentPop
+                    isDeleteMode={isDeleteMode}
+                    onDeleteSelect={handleDeleteSelect}
+                    onConfirmDelete={handleDeleteSelectedComments}
+                    onCancelDelete={() => {
+                      setSelectedCommentIds([]);
+                      setIsDeleteMode(false);
+                      setIsPopOpen(false);
+                    }}
+                    onDeleteAll={handleDeleteAllComments}
+                  />
+                </S.Popup>
+              )}
+            </S.EtcBox>
+          </S.CommentRow>
+
+          <S.CommentBox>
+            {comments.map((c) => (
+              <Comment
+                key={c.messageId}
+                id={c.messageId}
+                content={c.content}
+                checked={selectedCommentIds.includes(c.messageId)}
+                isDeleteMode={isDeleteMode}
+                onToggle={handleToggleComment}
+              />
+            ))}
+          </S.CommentBox>
+
+          <div ref={bottomRef} />
+        </S.CommentContainer>
+      </S.ContentWrapper>
+
+      <Input
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="댓글 입력"
+        onSubmit={handleAddComment}
+      />
+    </S.PageWrapper>
   );
 }
