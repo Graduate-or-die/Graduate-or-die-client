@@ -6,141 +6,199 @@ import DetailForm from "../../components/DetailForm";
 import DetailHeader from "../../components/DetailHeader";
 import { CategoryKey } from "../../constants/categories";
 import TabBar from "../../components/TabBar";
-import { DETAIL_DEFAULT_BY_CATEGORY } from "../../constants/defaultDetailItem";
 import { DetailItem } from "../../types/detail";
+import { defaultItems } from "../../constants/defaultItems";
+
+import {
+  getPortfolio,
+  deletePortfolio,
+  postEducations,
+  patchEducations,
+  postExperiences,
+  patchExperiences,
+  postActivities,
+  patchActivities,
+  postProjects,
+  patchProjects,
+  postAwards,
+  patchAwards,
+  postCapacities,
+  patchCapacities,
+  postEtc,
+  patchEtc,
+  deleteAttachment,
+} from "../../apis/portfolio";
 
 export default function DetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
   const navigate = useNavigate();
-
   const safeCategory = category as CategoryKey;
 
-  const [isEditing] = useState(true);
-  const [isSelectMode, setIsSelectMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [education, setEducation] = useState<DetailItem>({
-    ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-    id: 1,
-  });
+  const [education, setEducation] = useState<DetailItem | null>(null);
   const [experiences, setExperiences] = useState<DetailItem[]>([]);
   const [items, setItems] = useState<DetailItem[]>([]);
+  const [etc, setEtc] = useState<DetailItem | null>(null);
+
+  const [isSelectMode, setIsSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+
+  const portfolioMap: Record<CategoryKey, number> = {
+    education: 1,
+    experience: 2,
+    activity: 3,
+    award: 4,
+    qualification: 5,
+    project: 6,
+    etc: 7,
+  };
+
+  const portfolioType = portfolioMap[safeCategory];
+
+  const apiMap = {
+    education: { post: postEducations, patch: patchEducations },
+    experience: { post: postExperiences, patch: patchExperiences },
+    activity: { post: postActivities, patch: patchActivities },
+    project: { post: postProjects, patch: patchProjects },
+    award: { post: postAwards, patch: patchAwards },
+    qualification: { post: postCapacities, patch: patchCapacities },
+    etc: { post: postEtc, patch: patchEtc },
+  };
 
   useEffect(() => {
-    switch (safeCategory) {
-      case "education":
-        setEducation({
-          ...DETAIL_DEFAULT_BY_CATEGORY.education[0],
-          id: 1,
-        });
-        setExperiences(
-          DETAIL_DEFAULT_BY_CATEGORY.experience.map((e, idx) => ({
-            ...e,
-            id: idx + 1,
-          })),
-        );
-        break;
+    const fetchPortfolio = async () => {
+      try {
+        if (safeCategory === "education") {
+          const [eduRes, expRes] = await Promise.all([
+            getPortfolio(1),
+            getPortfolio(2),
+          ]);
 
-      case "etc":
-        setItems(
-          DETAIL_DEFAULT_BY_CATEGORY.etc.map((e, idx) => ({
-            ...e,
-            id: idx + 1,
-          })),
-        );
+          const eduItems = eduRes?.item?.items ?? [];
+          const expItems = expRes?.item?.items ?? [];
 
-        break;
-
-      default:
-        const defaultData = DETAIL_DEFAULT_BY_CATEGORY[safeCategory];
-        if (Array.isArray(defaultData)) {
-          setItems(defaultData.map((e, idx) => ({ ...e, id: idx + 1 })));
+          setEducation(eduItems[0] ?? defaultItems.education);
+          setExperiences(expItems);
+          return;
         }
-        break;
-    }
+
+        const data = await getPortfolio(portfolioType);
+        const rawItems = data?.item?.items ?? [];
+
+        if (safeCategory === "etc") {
+          setEtc(rawItems[0] ?? defaultItems.etc);
+        } else {
+          setItems(rawItems);
+        }
+      } catch (err) {
+        console.error("포트폴리오 조회 실패", err);
+      }
+    };
+
+    fetchPortfolio();
   }, [safeCategory]);
 
-  const handleItemChange = (id: number, value: DetailItem) => {
-    setItems((prev) => prev.map((item) => (item.id === id ? value : item)));
-  };
-
-  const handleEducationChange = (value: DetailItem) => {
-    setEducation(value);
-  };
-
-  const handleExperienceChange = (id: number, value: DetailItem) => {
-    setExperiences((prev) =>
-      prev.map((item) => (item.id === id ? value : item)),
+  const toggleSelect = (blockId: number) => {
+    setSelectedIds((prev) =>
+      prev.includes(blockId)
+        ? prev.filter((id) => id !== blockId)
+        : [...prev, blockId],
     );
   };
+
+  const handleDeleteSelected = async () => {
+    try {
+      if (selectedIds.length === 0) return;
+
+      if (safeCategory === "education") {
+        await Promise.all(
+          selectedIds.map((blockId) => deletePortfolio(2, blockId)),
+        );
+
+        setExperiences((prev) =>
+          prev.filter((item) => !selectedIds.includes(item.blockId ?? -1)),
+        );
+      } else {
+        await Promise.all(
+          selectedIds.map((blockId) => deletePortfolio(portfolioType, blockId)),
+        );
+
+        setItems((prev) =>
+          prev.filter((item) => !selectedIds.includes(item.blockId ?? -1)),
+        );
+      }
+
+      setSelectedIds([]);
+      setIsSelectMode(false);
+    } catch (err) {
+      console.error("삭제 실패", err);
+      alert("삭제에 실패했습니다.");
+    }
+  };
+
   const handleAdd = () => {
     if (safeCategory === "education") {
-      setExperiences((prev) => [...prev, { id: prev.length + 1 }]);
-    } else {
-      setItems((prev) => [...prev, { id: prev.length + 1 }]);
+      setExperiences((prev) => [...prev, defaultItems.experience]);
+    } else if (safeCategory !== "etc") {
+      setItems((prev) => [...prev, defaultItems[safeCategory]]);
+    }
+  };
+  const handleDeleteFile = async (blockId: number) => {
+    try {
+      await deleteAttachment(portfolioType, blockId);
+    } catch (err) {
+      console.error(err);
+      alert("파일 삭제 실패");
     }
   };
 
-  /* const removeItem = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-  }; */
+  const handleDone = async () => {
+    try {
+      if (safeCategory === "education") {
+        if (education) {
+          if (education.blockId) {
+            await patchEducations(education.blockId, education as any);
+          } else {
+            await postEducations(education as any);
+          }
+        }
 
-  const handleSelectMode = () => {
-    setIsSelectMode(true);
-    setSelectedIds([]);
-  };
+        await Promise.all(
+          experiences.map(async (exp) => {
+            if (exp.blockId) {
+              await patchExperiences(exp.blockId, exp as any);
+            } else {
+              await postExperiences(exp as any);
+            }
+          }),
+        );
+      } else if (safeCategory === "etc") {
+        if (!etc) return;
 
-  const toggleSelect = (id: number) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id],
-    );
-  };
-
-  const handleDeleteSelected = () => {
-    if (selectedIds.length === 0) {
-      setIsSelectMode(false);
-      return;
-    }
-
-    if (safeCategory === "education") {
-      setExperiences((prev) =>
-        prev.filter((item) => !selectedIds.includes(item.id)),
-      );
-    } else {
-      setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
-    }
-    setSelectedIds([]);
-    setIsSelectMode(false);
-  };
-
-  const normalizeItem = (item: DetailItem): DetailItem => {
-    const next = { ...item };
-
-    if (Array.isArray(next.links)) {
-      const cleaned = next.links.map((l) => l.trim()).filter(Boolean);
-
-      if (cleaned.length > 0) {
-        next.links = cleaned;
+        if (etc.blockId) {
+          await patchEtc(etc.blockId, etc as any);
+        } else {
+          await postEtc(etc as any);
+        }
       } else {
-        delete next.links;
+        const { post, patch } = apiMap[safeCategory];
+
+        await Promise.all(
+          items.map(async (item) => {
+            if (item.blockId) {
+              await patch(item.blockId, item as any);
+            } else {
+              await post(item as any);
+            }
+          }),
+        );
       }
+
+      navigate("/home");
+    } catch (err) {
+      console.error("저장 실패", err);
+      alert("저장에 실패했습니다.");
     }
-
-    return next;
   };
-
-  const handleDone = () => {
-    if (safeCategory === "education") {
-      console.log("저장될 데이터:", {
-        education: normalizeItem(education),
-        experiences: experiences.map(normalizeItem),
-      });
-    } else {
-      console.log("저장될 데이터:", items.map(normalizeItem));
-    }
-    navigate("/home");
-  };
-
-  const showPlus = safeCategory !== "etc";
 
   return (
     <>
@@ -150,57 +208,74 @@ export default function DetailPage() {
         <S.DoneBox onClick={handleDone}>완료</S.DoneBox>
 
         {!isSelectMode ? (
-          <S.DoneBox onClick={handleSelectMode}>선택</S.DoneBox>
+          <S.DoneBox onClick={() => setIsSelectMode(true)}>선택</S.DoneBox>
         ) : (
-          <S.TrashIconWrapper>
-            <Trash
-              onClick={handleDeleteSelected}
-              style={{ cursor: "pointer" }}
-            />
-          </S.TrashIconWrapper>
+          <S.TrashBox>
+            <Trash onClick={handleDeleteSelected} />
+          </S.TrashBox>
         )}
       </S.DoneTrashContainer>
 
       <S.FormContainer>
-        {safeCategory === "education" ? (
+        {safeCategory === "education" && education && (
           <>
             <DetailForm
               category="education"
               value={education}
-              isEditing={isEditing}
-              onChange={handleEducationChange}
+              isEditing
+              onChange={(v) => setEducation(v)}
             />
 
-            {experiences.map((item) => (
+            {experiences.map((item, index) => (
               <DetailForm
-                key={item.id}
+                key={item.blockId ?? `exp-${index}`}
                 category="experience"
                 value={item}
-                isEditing={isEditing}
+                isEditing
                 isSelectMode={isSelectMode}
-                isSelected={selectedIds.includes(item.id)}
-                onToggleSelect={() => toggleSelect(item.id)}
-                onChange={(v) => handleExperienceChange(item.id, v)}
+                isSelected={selectedIds.includes(item.blockId ?? -1)}
+                onToggleSelect={() =>
+                  item.blockId && toggleSelect(item.blockId)
+                }
+                onChange={(v) =>
+                  setExperiences((prev) =>
+                    prev.map((it, i) => (i === index ? v : it)),
+                  )
+                }
               />
             ))}
           </>
-        ) : (
-          items.map((item) => (
+        )}
+
+        {safeCategory === "etc" && etc && (
+          <DetailForm
+            category="etc"
+            value={etc}
+            isEditing
+            onChange={(v) => setEtc(v)}
+          />
+        )}
+
+        {safeCategory !== "education" &&
+          safeCategory !== "etc" &&
+          items.map((item, index) => (
             <DetailForm
-              key={item.id}
+              key={item.blockId ?? `new-${index}`}
               category={safeCategory}
               value={item}
-              isEditing={isEditing}
+              isEditing
               isSelectMode={isSelectMode}
-              isSelected={selectedIds.includes(item.id)}
-              onToggleSelect={() => toggleSelect(item.id)}
-              onChange={(v) => handleItemChange(item.id, v)}
+              isSelected={selectedIds.includes(item.blockId ?? -1)}
+              onDeleteFile={handleDeleteFile}
+              onToggleSelect={() => item.blockId && toggleSelect(item.blockId)}
+              onChange={(v) =>
+                setItems((prev) => prev.map((it, i) => (i === index ? v : it)))
+              }
             />
-          ))
-        )}
+          ))}
       </S.FormContainer>
 
-      {showPlus && (
+      {safeCategory !== "etc" && (
         <S.PlusBox onClick={handleAdd}>
           <Plus style={{ color: "#0086AB" }} />
         </S.PlusBox>

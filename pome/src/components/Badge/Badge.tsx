@@ -8,7 +8,7 @@ interface BadgeProps {
 export default function Badge({ label, height, fontSize }: BadgeProps) {
   return (
     <S.BadgeTag height={height}>
-      <S.BadgeText fontSize={fontSize}>#{label}</S.BadgeText>
+      <S.BadgeText fontSize={fontSize}>{label}</S.BadgeText>
     </S.BadgeTag>
   );
 }

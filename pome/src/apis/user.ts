@@ -1,0 +1,53 @@
+import { jsonAxios, formDataAxios } from "../axios";
+export interface PatchMyPageRequest {
+  userName: string;
+  nickName: string;
+  introduction: string;
+  job: string;
+  matching: boolean;
+  removeProfileImage?: boolean;
+}
+export const getMyPage = async () => {
+  const res = await jsonAxios.get("/users/mypage");
+  return res.data.result;
+};
+export const patchMyPage = async (data: PatchMyPageRequest, files?: File[]) => {
+  const formData = new FormData();
+
+  formData.append(
+    "data",
+    new Blob([JSON.stringify(data)], { type: "application/json" }),
+  );
+
+  files?.forEach((file) => formData.append("file", file));
+
+  const res = await formDataAxios.patch("/users/mypage", formData);
+
+  return res.data.result;
+};
+export const getProfile = async () => {
+  const res = await jsonAxios.get("/files/profile", {
+    responseType: "blob",
+  });
+  const imageUrl = URL.createObjectURL(res.data);
+
+  return imageUrl;
+};
+
+export const getUserSearch = async (name: string) => {
+  const res = await jsonAxios.get("/users/search", {
+    params: { name },
+  });
+
+  return res.data;
+};
+
+export const postUserLike = async (mateId: number) => {
+  const res = await jsonAxios.post(`/users/likes/${mateId}`);
+  return res.data.result;
+};
+
+export const deleteUserLike = async (mateId: number) => {
+  const res = await jsonAxios.delete(`/users/likes/${mateId}`);
+  return res.data.result;
+};

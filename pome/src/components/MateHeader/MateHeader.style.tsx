@@ -25,9 +25,15 @@ export const ProfileBox = styled.div`
   height: 39px;
   aspect-ratio: 1/1;
   border-radius: 50%;
+  overflow: hidden;
   svg {
     width: 100%;
     height: 100%;
+  }
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 `;
 export const AlarmBox = styled.div`

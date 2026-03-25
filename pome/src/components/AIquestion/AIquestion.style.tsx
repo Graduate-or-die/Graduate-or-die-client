@@ -2,7 +2,7 @@ import styled from "@emotion/styled";
 export const AIContainer = styled.div<{ expanded: boolean }>`
   pointer-events: auto;
   width: ${({ expanded }) => (expanded ? "360px" : "140px")};
-  height: ${({ expanded }) => (expanded ? "100px" : "40px")};
+  height: ${({ expanded }) => (expanded ? "120px" : "40px")};
   border-radius: 15px;
   background: rgba(154, 229, 255, 0.3);
   transition:

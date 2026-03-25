@@ -98,3 +98,13 @@ export const InfoBox2 = styled.span`
   white-space: normal;
   word-break: break-word;
 `;
+export const DeleteBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
+  color: #ff4d4f;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+`;

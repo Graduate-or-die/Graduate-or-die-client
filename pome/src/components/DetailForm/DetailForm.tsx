@@ -1,15 +1,17 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
-import { DetailItem } from "../../types/detail";
+import { Link, Check, SelectCheck, Plus, Delete } from "../../icons";
+import { EtcItem, DetailItem } from "../../types/detail";
 import { hasComment } from "../../constants/comments";
+import { getFileDownload } from "../../apis/portfolio";
 
 export type DetailFormProps = {
   category: CategoryKey;
   value: DetailItem | null;
   onChange?: (v: DetailItem) => void;
+  onDeleteFile?: (blockId: number) => void;
   isEditing: boolean;
   isBase?: boolean;
   isSelectMode?: boolean;
@@ -25,6 +27,7 @@ export default function DetailForm({
   category,
   value,
   onChange,
+  onDeleteFile,
   isEditing,
   isBase = false,
   isSelectMode,
@@ -40,303 +43,319 @@ export default function DetailForm({
 
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState("");
-  const [exprDisabled, setExprDisabled] = useState<Record<string, boolean>>({});
 
-  if (!value) return null;
-  const safeValue = value;
-  const links = Array.isArray(safeValue.content) ? safeValue.content : [];
+  const safeValue = value ?? ({} as DetailItem);
+  const isEtcItem = (item: DetailItem): item is EtcItem => "link" in item;
+  const links =
+    isEtcItem(safeValue) && Array.isArray(safeValue.link) ? safeValue.link : [];
+  const visibleLinkCount = links.filter((l) => l.trim() !== "").length;
+  const attachmentId = (safeValue as any).file?.fileId;
+
+  useEffect(() => {
+    const file = (safeValue as any).file;
+    if (file?.originalFileName) setFileName(file.originalFileName);
+  }, [safeValue]);
+
+  const getFieldValue = (name: string) => (safeValue as any)[name] ?? "";
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     const { name, value: inputValue } = e.target;
-    onChange?.({
-      ...safeValue,
-      [name]: inputValue,
-    });
+    onChange?.({ ...safeValue, [name]: inputValue } as DetailItem);
   };
 
-  const handleFileClick = () => {
-    if (!isEditing) return;
-    fileRef.current?.click();
-  };
+  const handleFileClick = () => isEditing && fileRef.current?.click();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setFileName(file.name);
-    onChange?.({
-      ...safeValue,
-      [e.target.name]: file,
-    });
+    onChange?.({ ...safeValue, [e.target.name]: file } as DetailItem);
   };
 
-  const toggleExpr = (name: string) => {
+  const handleFileDelete = () => {
+    const blockId = (safeValue as any).blockId;
+    if (blockId && onDeleteFile) onDeleteFile(blockId);
+
+    setFileName("");
+    if (fileRef.current) fileRef.current.value = "";
+
+    onChange?.({ ...safeValue, file: null } as DetailItem);
+  };
+
+  const handleDownload = async (attachmentId: number, fileName: string) => {
+    try {
+      const res = await getFileDownload(attachmentId);
+
+      const blob = new Blob([res.data]);
+      const url = window.URL.createObjectURL(blob);
+
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("파일 다운로드 실패", error);
+    }
+  };
+
+  const toggleExpr = (fieldName: string) => {
     if (!isEditing) return;
-    const currentlyDisabled = exprDisabled[name] ?? safeValue[name] === null;
 
-    setExprDisabled((prev) => ({
-      ...prev,
-      [name]: !prev[name],
-    }));
+    const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
+    const newHasEndAt = !hasEndAt;
 
-    onChange?.({
+    const updatedValue: any = {
       ...safeValue,
-      [name]: currentlyDisabled ? "" : null,
-    });
+      hasQualificationEndAt: newHasEndAt,
+      qualificationEndAt: newHasEndAt
+        ? getFieldValue("qualificationEndAt")
+        : null,
+    };
+
+    onChange?.(updatedValue);
   };
 
   const handleLinkAdd = () => {
-    if (!isEditing) return;
-    const currentLinks = Array.isArray(safeValue.content)
-      ? safeValue.content
-      : [];
-    if (currentLinks.length >= 4) return;
-    const { comments, ...rest } = safeValue;
-    onChange?.({
-      ...rest,
-      content: [...currentLinks, ""],
-    });
+    if (!isEditing || !isEtcItem(safeValue) || visibleLinkCount >= 4) return;
+    onChange?.({ ...safeValue, link: [...(safeValue.link ?? []), ""] });
   };
 
   const handleLinkChange = (index: number, newValue: string) => {
-    const currentLinks = Array.isArray(safeValue.content)
-      ? safeValue.content
-      : [];
-    const next = [...currentLinks];
-    next[index] = newValue;
-    const { comments, ...rest } = safeValue;
-    onChange?.({ ...rest, content: next });
+    if (!isEtcItem(safeValue)) return;
+    const nextLinks = [...(safeValue.link ?? [])];
+    nextLinks[index] = newValue;
+    onChange?.({ ...safeValue, link: nextLinks });
   };
 
-  /* const savedLinks = (safeValue.links ?? [])
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  const renderLinks = (() => {
-    if (isEditing && savedLinks.length === 0) {
-      return [""];
+  const getPeriodFieldNames = (category: CategoryKey) => {
+    switch (category) {
+      case "experience":
+        return { start: "experienceStartAt", end: "experienceEndAt" };
+      case "activity":
+        return { start: "activityStartAt", end: "activityEndAt" };
+      case "project":
+        return { start: "projectStartAt", end: "projectEndAt" };
+      default:
+        return { start: "periodStart", end: "periodEnd" };
     }
+  };
 
-    if (isEditing && savedLinks.length < 4) {
-      return [...savedLinks, ""];
-    }
-
-    return savedLinks;
-  })(); */
-  
-  const Container = isEducation ? S.EduContainer : React.Fragment;
-  const FormBoxContainer = isEducation ? S.EduFormContainer : S.FormContainer;
-
-  const renderField = (field: Field) => {
-    const rawValue = safeValue[field.name];
-    const inputValue: string | number | readonly string[] | undefined =
-      typeof rawValue === "string" ||
-      typeof rawValue === "number" ||
-      Array.isArray(rawValue)
-        ? rawValue
-        : undefined;
-
-    const showRedDot = isMyPage && hasComment(category, field.name, value.id);
-
-    const handleFileDelete = () => {
-      setFileName("");
-
-      if (fileRef.current) {
-        fileRef.current.value = "";
+  const renderPeriodField = (field: Field) => {
+    const { start, end } = getPeriodFieldNames(category);
+    const startValue = getFieldValue(start);
+    const endValue = getFieldValue(end);
+    const startReadOnly = !isEditing || startValue === null;
+    const endReadOnly = !isEditing || endValue === null;
+    const handleClick = () => {
+      if (!isEditing) {
+        onFieldClick?.(start);
       }
-
-      onChange?.({
-        ...safeValue,
-        [field.name]: null,
-      });
     };
+    return (
+      <S.PeriodBox onClick={handleClick}>
+        <S.DateBox
+          name={start}
+          value={startValue ?? ""}
+          onChange={handleChange}
+          readOnly={startReadOnly}
+        />
+        <span>~</span>
+        <S.DateBox
+          name={end}
+          value={endValue ?? ""}
+          onChange={handleChange}
+          readOnly={endReadOnly}
+        />
+      </S.PeriodBox>
+    );
+  };
+
+  const renderFileField = (field: Field) => (
+    <>
+      <S.FileBox
+        type="file"
+        name={field.name}
+        ref={fileRef}
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+      <S.FileContainer>
+        <S.FileNameBox
+          onClick={() => {
+            if (!fileName && fileRef.current) {
+              fileRef.current.click();
+              return;
+            }
+            if (fileName && attachmentId) {
+              handleDownload(attachmentId, fileName);
+            }
+          }}
+        >
+          {fileName || "파일을 첨부하세요"}
+        </S.FileNameBox>
+        {showAttachButton &&
+          fileName &&
+          (category === "qualification" || category === "award") && (
+            <S.DeleteBox onClick={handleFileDelete}>
+              <Delete />
+            </S.DeleteBox>
+          )}
+        {showAttachButton && (
+          <S.AttachButton
+            type="button"
+            onClick={handleFileClick}
+            disabled={!isEditing}
+          >
+            첨부
+          </S.AttachButton>
+        )}
+      </S.FileContainer>
+    </>
+  );
+
+  const renderExprField = (field: Field) => {
+    const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
+    const value = hasEndAt ? getFieldValue(field.name) : null;
+    const isDisabled = !hasEndAt;
 
     return (
-      <S.FormRow key={field.name}>
+      <>
+        <S.FormBox
+          name={field.name}
+          value={value ?? ""}
+          onChange={handleChange}
+          disabledTone={isDisabled}
+          readOnly={!isEditing || isDisabled}
+        />
+        <S.CheckContainer onClick={() => toggleExpr(field.name)}>
+          {isDisabled ? <Check /> : <S.CheckBox />}
+          <S.CheckFont>만료 일자 없음</S.CheckFont>
+        </S.CheckContainer>
+      </>
+    );
+  };
+
+  const renderLinkField = (field: Field) => (
+    <>
+      {isEtcItem(safeValue) &&
+        links.map((link, index) => {
+          return (
+            <S.LinkContainer key={index}>
+              <S.LinkIcon>
+                <Link />
+              </S.LinkIcon>
+              <S.LinkBox
+                value={link}
+                onChange={
+                  isEditing
+                    ? (e) => handleLinkChange(index, e.target.value)
+                    : undefined
+                }
+                disabled={!isEditing}
+              />
+            </S.LinkContainer>
+          );
+        })}
+      {isEtcItem(safeValue) && visibleLinkCount < 4 && isEditing && (
+        <S.LinkAdd>
+          <Plus style={{ color: "#0086AB" }} onClick={handleLinkAdd} />
+        </S.LinkAdd>
+      )}
+    </>
+  );
+
+  const renderField = (field: Field) => {
+    const inputValue = getFieldValue(field.name);
+    const showRedDot = isMyPage && hasComment(category, field.name, value?.id);
+
+    const isDisabled =
+      !isEditing ||
+      (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
+
+    return (
+      <S.FormRow
+        key={field.name}
+        onClick={() => {
+          if (!isEditing) {
+            if (field.name === "file") return;
+
+            if (field.kind === "period") {
+              const { start } = getPeriodFieldNames(category);
+              onFieldClick?.(start);
+            } else {
+              onFieldClick?.(field.name);
+            }
+          }
+        }}
+      >
         <S.FormLabel>
           {field.label}
-          {showRedDot && (
-            <S.RedDotBox>
-              <RedDot />
-            </S.RedDotBox>
-          )}
+          {showRedDot && <S.RedDotBox></S.RedDotBox>}
         </S.FormLabel>
 
         {field.kind === "period" ? (
-          <S.PeriodBox>
-            <S.DateBox
-              name="periodStart"
-              value={(safeValue.periodStart as string) || ""}
-              onChange={handleChange}
-              readOnly={!isEditing}
-              onClick={() => {
-                if (!isEditing) {
-                  onFieldClick?.(field.name);
-                }
-              }}
-            />
-            <span>~</span>
-            <S.DateBox
-              name="periodEnd"
-              value={(safeValue.periodEnd as string) || ""}
-              onChange={handleChange}
-              readOnly={!isEditing || exprDisabled[field.name]}
-              onClick={() => {
-                if (!isEditing) {
-                  onFieldClick?.(field.name);
-                }
-              }}
-            />
-          </S.PeriodBox>
+          renderPeriodField(field)
         ) : field.kind === "textarea" ? (
           <S.FormBoxArea
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
-            readOnly={!isEditing}
-            onClick={() => {
-              if (!isEditing) {
-                onFieldClick?.(field.name);
-              }
-            }}
+            readOnly={isDisabled}
           />
         ) : field.kind === "file" ? (
-          <>
-            <S.FileBox
-              type="file"
-              name={field.name}
-              ref={fileRef}
-              onChange={handleFileChange}
-              style={{ display: "none" }}
-            />
-            <S.FileContainer>
-              <S.FileNameBox
-                value={fileName}
-                placeholder="파일을 첨부하세요"
-                readOnly
-              />
-              {fileName && (
-                <S.DeleteBox onClick={handleFileDelete}>
-                  <Delete />
-                </S.DeleteBox>
-              )}
-              {showAttachButton && (
-                <S.AttachButton
-                  type="button"
-                  onClick={handleFileClick}
-                  disabled={!isEditing}
-                >
-                  첨부
-                </S.AttachButton>
-              )}
-            </S.FileContainer>
-          </>
+          renderFileField(field)
         ) : field.kind === "memo" ? (
           <S.Memo
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
-            readOnly={!isEditing}
+            readOnly={isDisabled}
           />
         ) : field.kind === "expr" ? (
-          <>
-            <S.FormBox
-              name={field.name}
-              value={inputValue}
-              onChange={handleChange}
-              readOnly={
-                !isEditing ||
-                exprDisabled[field.name] ||
-                safeValue[field.name] === null
-              }
-              disabledTone={
-                exprDisabled[field.name] || safeValue[field.name] === null
-              }
-              onClick={() => {
-                if (!isEditing) {
-                  onFieldClick?.(field.name);
-                }
-              }}
-            />
-            <S.CheckContainer onClick={() => toggleExpr(field.name)}>
-              {safeValue[field.name] === null || exprDisabled[field.name] ? (
-                <Check />
-              ) : (
-                <S.CheckBox />
-              )}
-              <S.CheckFont>만료 일자 없음</S.CheckFont>
-            </S.CheckContainer>
-          </>
+          renderExprField(field)
         ) : field.kind === "link" ? (
-          <>
-            {Array.isArray(safeValue.content) &&
-              safeValue.content.map((link, index) => (
-                <S.LinkContainer key={index}>
-                  <S.LinkIcon>
-                    <Link />
-                  </S.LinkIcon>
-                  <S.LinkBox
-                    value={link}
-                    onChange={
-                      isEditing
-                        ? (e) => handleLinkChange(index, e.target.value)
-                        : undefined
-                    }
-                    disabled={!isEditing}
-                  />
-                </S.LinkContainer>
-              ))}
-            {Array.isArray(safeValue.content) &&
-              links.length < 4 &&
-              isEditing && (
-                <S.LinkAdd>
-                  <Plus
-                    style={{ color: "#0086AB" }}
-                    onClick={() => handleLinkAdd()}
-                  />
-                </S.LinkAdd>
-              )}
-          </>
+          renderLinkField(field)
         ) : (
           <S.FormBox
             name={field.name}
-            value={inputValue}
+            value={inputValue ?? ""}
             onChange={handleChange}
             gray={isEducation || field.group === "education"}
-            readOnly={!isEditing}
-            onClick={() => {
-              if (!isEditing) {
-                onFieldClick?.(field.name);
-              }
-            }}
+            readOnly={isDisabled}
           />
         )}
       </S.FormRow>
     );
   };
 
+  const Container = isEducation ? S.EduContainer : React.Fragment;
+  const FormBoxContainer = isEducation ? S.EduFormContainer : S.FormContainer;
+
   return (
-    <>
-      <Container>
-        <FormBoxContainer>
-          <S.FormHeader>
-            <S.FormName>{CATEGORIES[category]}</S.FormName>
-            {isSelectMode && (
-              <S.SelectCircle
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onToggleSelect?.();
-                }}
-              >
-                {isSelected && <SelectCheck />}
-              </S.SelectCircle>
-            )}
-          </S.FormHeader>
-          {fields.map(renderField)}
-        </FormBoxContainer>
-      </Container>
-    </>
+    <Container>
+      <FormBoxContainer>
+        <S.FormHeader>
+          <S.FormName>{CATEGORIES[category]}</S.FormName>
+          {isSelectMode && (
+            <S.SelectCircle
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleSelect?.();
+              }}
+            >
+              {isSelected && <SelectCheck />}
+            </S.SelectCircle>
+          )}
+        </S.FormHeader>
+
+        {fields.map(renderField)}
+      </FormBoxContainer>
+    </Container>
   );
 }

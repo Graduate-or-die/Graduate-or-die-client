@@ -1,29 +1,72 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as S from "./MateHomePage.style";
 import MateHeader from "../../components/MateHeader";
 import TabBar from "../../components/TabBar";
 import Menu from "../../components/Menu";
 import { useLocation } from "react-router-dom";
-import {
-  DETAIL_DEFAULT_MATE_CATEGORY,
-  DETAIL_DEFAULT_BY_CATEGORY,
-} from "../../constants/defaultDetailItem";
+import { getMateVisibility } from "../../apis/mate";
+import { getVisibility } from "../../apis/portfolio";
 
 type TabType = "mate" | "my";
+
 export default function MateHomePage() {
   const location = useLocation();
+
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     return location.state?.backTab ?? "mate";
   });
-  const menuData =
-    activeTab === "mate"
-      ? DETAIL_DEFAULT_MATE_CATEGORY
-      : DETAIL_DEFAULT_BY_CATEGORY;
+
+  const [visibilityMap, setVisibilityMap] = useState<Record<number, boolean>>(
+    {},
+  );
+  const [previewMap, setPreviewMap] = useState<Record<number, any[]>>({});
+  const [mateId, setMateId] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchVisibility = async () => {
+      try {
+        const res =
+          activeTab === "mate"
+            ? await getMateVisibility()
+            : await getVisibility();
+
+        const data = res;
+        const map: Record<number, boolean> = {};
+        const preview: Record<number, any[]> = {};
+
+        data.visibility.forEach((v: any) => {
+          map[v.typeId] = v.visible;
+        });
+
+        Object.entries(data.previews).forEach(([typeId, value]: any) => {
+          preview[Number(typeId)] = value.items;
+        });
+
+        setVisibilityMap(map);
+        setPreviewMap(preview);
+        if (activeTab === "mate") {
+          setMateId(data.mateId);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchVisibility();
+  }, [activeTab]);
+
+  const handleVisibilityChange = (typeId: number, visible: boolean) => {
+    setVisibilityMap((prev) => ({
+      ...prev,
+      [typeId]: visible,
+    }));
+  };
 
   return (
     <>
       <S.PageWrapper>
         <MateHeader />
+
         <S.ContentWrapper>
           <S.CenterWrapper>
             <S.MateHomeWrapper>
@@ -39,6 +82,7 @@ export default function MateHomePage() {
                     메이트
                   </S.BadgeText>
                 </S.TabBadge>
+
                 <S.TabBadge
                   $active={activeTab === "my"}
                   onClick={() => {
@@ -51,15 +95,19 @@ export default function MateHomePage() {
               </S.BadgeContainer>
               <S.HomeMenu>
                 <Menu
-                  data={menuData}
+                  previewMap={previewMap}
                   basePath={activeTab === "mate" ? "mate" : "my"}
                   isOwner={activeTab === "my"}
+                  visibilityMap={visibilityMap}
+                  onToggleVisibility={handleVisibilityChange}
+                  mateId={mateId}
                 />
               </S.HomeMenu>
             </S.MateHomeWrapper>
           </S.CenterWrapper>
         </S.ContentWrapper>
       </S.PageWrapper>
+
       <TabBar />
     </>
   );
