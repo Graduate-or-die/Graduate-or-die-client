@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
+import { Link, Check, SelectCheck, Plus, Delete } from "../../icons";
 import { EtcItem, DetailItem } from "../../types/detail";
 import { hasComment } from "../../constants/comments";
 import { getFileDownload } from "../../apis/portfolio";
@@ -296,11 +296,7 @@ export default function DetailForm({
       >
         <S.FormLabel>
           {field.label}
-          {showRedDot && (
-            <S.RedDotBox>
-              <RedDot />
-            </S.RedDotBox>
-          )}
+          {showRedDot && <S.RedDotBox></S.RedDotBox>}
         </S.FormLabel>
 
         {field.kind === "period" ? (
