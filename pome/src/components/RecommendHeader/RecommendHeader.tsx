@@ -1,6 +1,6 @@
 import React from "react";
 import * as S from "./RecommendHeader.style";
-import { Alarm, PomeLogo, Friends } from "../../icons";
+import { PomeLogo, Friends } from "../../icons";
 import { useNavigate } from "react-router-dom";
 export default function RecommendHeader() {
   const navigate = useNavigate();
@@ -13,7 +13,6 @@ export default function RecommendHeader() {
           <PomeLogo />
           <S.IconBox>
             <Friends onClick={() => navigate("/request")} />
-            <Alarm />
           </S.IconBox>
         </S.HeaderBox>
       </S.Header>
