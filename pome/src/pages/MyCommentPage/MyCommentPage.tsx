@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import * as S from "./MyCommentPage.style";
 import Comment from "../../components/Comment";
@@ -8,6 +8,16 @@ import { CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS } from "../../constants/categoryFields";
 import { getPortfolio } from "../../apis/portfolio";
 import { postCommentList, postFieldsRead } from "../../apis/comment";
+
+const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
+  education: 1,
+  experience: 2,
+  activity: 3,
+  award: 4,
+  qualification: 5,
+  project: 6,
+  etc: 7,
+};
 
 export default function MyCommentPage() {
   const { category, blockId, fieldKey } = useParams<{
@@ -27,15 +37,6 @@ export default function MyCommentPage() {
   const myUserId = Number(localStorage.getItem("userId"));
   const readCalledRef = useRef(false);
 
-  const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
-    education: 1,
-    experience: 2,
-    activity: 3,
-    award: 4,
-    qualification: 5,
-    project: 6,
-    etc: 7,
-  };
   const getRealFieldKeys = (category: CategoryKey, fieldKey: string) => {
     if (fieldKey !== "period") return [fieldKey];
 
@@ -50,17 +51,17 @@ export default function MyCommentPage() {
         return [];
     }
   };
-  const handleRead = async () => {
+
+  const handleRead = useCallback(async () => {
     if (readCalledRef.current) return;
     readCalledRef.current = true;
 
-    if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+    if (!safeCategory || !blockId || !fieldKey) return;
 
     const typeId = CATEGORY_TYPE_ID[safeCategory];
-
     const numericBlockId = Number(blockId);
 
-    if (!typeId || isNaN(numericBlockId)) return;
+    if (!myUserId || !typeId || isNaN(numericBlockId)) return;
 
     try {
       const realFieldKeys = getRealFieldKeys(safeCategory, fieldKey);
@@ -77,7 +78,7 @@ export default function MyCommentPage() {
     } catch (e) {
       console.error("read 실패", e);
     }
-  };
+  }, [myUserId, safeCategory, blockId, fieldKey]);
 
   useEffect(() => {
     if (!safeCategory) return;
@@ -97,23 +98,9 @@ export default function MyCommentPage() {
 
   useEffect(() => {
     return () => {
-      if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
-
-      const typeId = CATEGORY_TYPE_ID[safeCategory];
-
-      const realFieldKeys = getRealFieldKeys(safeCategory, fieldKey);
-
-      Promise.all(
-        realFieldKeys.map((key) =>
-          postFieldsRead(myUserId, {
-            typeId,
-            blockId: Number(blockId),
-            fieldKey: key,
-          }),
-        ),
-      ).catch((e) => console.error("read 실패", e));
+      handleRead();
     };
-  }, [myUserId, safeCategory, blockId, fieldKey]);
+  }, [handleRead]);
 
   useEffect(() => {
     const handlePopState = () => {
@@ -121,20 +108,17 @@ export default function MyCommentPage() {
     };
 
     window.addEventListener("popstate", handlePopState);
-
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-    };
-  }, [blockId, fieldKey]);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [handleRead]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [comments]);
 
   useEffect(() => {
-    const fetchComments = async () => {
-      if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+    if (!safeCategory || !blockId || !fieldKey || !myUserId) return;
 
+    const fetchComments = async () => {
       setLoadingComments(true);
 
       const typeId = CATEGORY_TYPE_ID[safeCategory];
@@ -153,8 +137,7 @@ export default function MyCommentPage() {
           ),
         );
 
-        const merged = results.flatMap((res) => res || []);
-        setComments(merged);
+        setComments(results.flatMap((res) => res || []));
       } catch (e) {
         console.error("댓글 조회 실패", e);
       } finally {
@@ -164,6 +147,7 @@ export default function MyCommentPage() {
 
     fetchComments();
   }, [myUserId, safeCategory, blockId, fieldKey]);
+
   if (!category || !blockId || !fieldKey) return null;
   if (portfolio.length === 0) return <div>로딩중...</div>;
 
@@ -189,9 +173,8 @@ export default function MyCommentPage() {
 
   let displayValue = "-";
   const { start, end } = getPeriodFieldNames(safeCategory);
-  const isPeriodField = fieldKey === "period";
 
-  if (isPeriodField) {
+  if (fieldKey === "period") {
     const startValue = targetItem?.[start];
     const endValue = targetItem?.[end];
     displayValue =
@@ -211,6 +194,7 @@ export default function MyCommentPage() {
     <>
       <S.PageWrapper>
         <DetailHeader category={safeCategory} />
+
         <S.ContentWrapper>
           <S.FormContainer>
             <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>

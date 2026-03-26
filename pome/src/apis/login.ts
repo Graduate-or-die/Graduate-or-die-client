@@ -1,4 +1,3 @@
-import { jsonAxios } from "../axios";
 const REST_API_KEY = process.env.REACT_APP_KAKAO_REST_API_KEY;
 const REDIRECT_URI = "http://43.203.188.196/auth/login";
 export const getLogin = () => {

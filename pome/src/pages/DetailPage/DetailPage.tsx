@@ -29,9 +29,20 @@ import {
   deleteAttachment,
 } from "../../apis/portfolio";
 
+const portfolioMap: Record<CategoryKey, number> = {
+  education: 1,
+  experience: 2,
+  activity: 3,
+  award: 4,
+  qualification: 5,
+  project: 6,
+  etc: 7,
+};
+
 export default function DetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
   const navigate = useNavigate();
+
   const safeCategory = category as CategoryKey;
 
   const [education, setEducation] = useState<DetailItem | null>(null);
@@ -41,16 +52,6 @@ export default function DetailPage() {
 
   const [isSelectMode, setIsSelectMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
-  const portfolioMap: Record<CategoryKey, number> = {
-    education: 1,
-    experience: 2,
-    activity: 3,
-    award: 4,
-    qualification: 5,
-    project: 6,
-    etc: 7,
-  };
 
   const portfolioType = portfolioMap[safeCategory];
 
@@ -95,7 +96,7 @@ export default function DetailPage() {
     };
 
     fetchPortfolio();
-  }, [safeCategory]);
+  }, [safeCategory, portfolioType]);
 
   const toggleSelect = (blockId: number) => {
     setSelectedIds((prev) =>
@@ -142,6 +143,7 @@ export default function DetailPage() {
       setItems((prev) => [...prev, defaultItems[safeCategory]]);
     }
   };
+
   const handleDeleteFile = async (blockId: number) => {
     try {
       await deleteAttachment(portfolioType, blockId);
@@ -199,6 +201,8 @@ export default function DetailPage() {
       alert("저장에 실패했습니다.");
     }
   };
+
+  if (!category) return null;
 
   return (
     <>

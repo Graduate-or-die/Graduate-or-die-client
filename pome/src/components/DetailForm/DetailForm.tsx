@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
@@ -43,7 +43,8 @@ export default function DetailForm({
   const fileRef = useRef<HTMLInputElement | null>(null);
   const [fileName, setFileName] = useState("");
 
-  const safeValue = value ?? ({} as DetailItem);
+  const safeValue = useMemo(() => value ?? ({} as DetailItem), [value]);
+
   const isEtcItem = (item: DetailItem): item is EtcItem => "link" in item;
   const links =
     isEtcItem(safeValue) && Array.isArray(safeValue.link) ? safeValue.link : [];
@@ -65,12 +66,14 @@ export default function DetailForm({
   };
 
   const handleFileClick = () => isEditing && fileRef.current?.click();
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
     onChange?.({ ...safeValue, [e.target.name]: file } as DetailItem);
   };
+
   const handleFileDelete = () => {
     const blockId = (safeValue as any).blockId;
     if (blockId && onDeleteFile) onDeleteFile(blockId);
@@ -92,7 +95,7 @@ export default function DetailForm({
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("파일 다운로드 실패", error);
+      console.error(error);
     }
   };
 
@@ -141,11 +144,9 @@ export default function DetailForm({
     const endValue = getFieldValue(end);
     const startReadOnly = !isEditing || startValue === null;
     const endReadOnly = !isEditing || endValue === null;
-    const handleClick = () => {
-      if (!isEditing) onFieldClick?.("period");
-    };
+
     return (
-      <S.PeriodBox onClick={handleClick}>
+      <S.PeriodBox onClick={() => !isEditing && onFieldClick?.("period")}>
         <S.DateBox
           name={start}
           value={startValue ?? ""}
@@ -206,6 +207,7 @@ export default function DetailForm({
     const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
     const value = hasEndAt ? getFieldValue(field.name) : null;
     const isDisabled = !hasEndAt;
+
     return (
       <>
         <S.FormBox
@@ -265,7 +267,6 @@ export default function DetailForm({
 
     const typeId = typeIdMap[category];
     const blockId = (value as any)?.blockId;
-
     const isPeriodField = field.kind === "period";
 
     const showRedDot =
@@ -275,6 +276,7 @@ export default function DetailForm({
       (isPeriodField
         ? unreadMap.has(`${typeId}-${blockId}-period`)
         : unreadMap.has(`${typeId}-${blockId}-${field.name}`));
+
     const isDisabled =
       !isEditing ||
       (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
