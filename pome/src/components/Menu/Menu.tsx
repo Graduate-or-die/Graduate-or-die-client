@@ -12,16 +12,6 @@ import { CategoryKey } from "../../constants/categories";
 import { useNavigate } from "react-router-dom";
 import { postVisibility } from "../../apis/portfolio";
 
-const CATEGORY_TYPE_ID = {
-  education: 1,
-  experience: 2,
-  activity: 3,
-  award: 4,
-  qualification: 5,
-  project: 6,
-  etc: 7,
-} as const;
-
 interface MenuSectionProps {
   title: string;
   typeIds: number[];

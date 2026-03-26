@@ -12,7 +12,6 @@ function Input(
   { value, onSubmit, onChange, placeholder }: InputProps,
   ref: React.Ref<HTMLInputElement>,
 ) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const handleSubmit = () => {
     if (!value.trim()) return;
     onSubmit(value);

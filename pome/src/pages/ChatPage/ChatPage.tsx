@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import * as S from "./ChatPage.style";
 import { Message } from "../../types/message";
 import ChatHeader from "../../components/ChatHeader";
@@ -16,9 +16,6 @@ export default function ChatPage() {
   const prevLengthRef = useRef(0);
 
   const myId: number = Number(localStorage.getItem("userId"));
-  if (!myId) {
-    console.error("userId 없음");
-  }
 
   const scrollToBottom = (smooth = true) => {
     bottomRef.current?.scrollIntoView({
@@ -29,11 +26,10 @@ export default function ChatPage() {
   const isNearBottom = () => {
     const el = chatRef.current;
     if (!el) return false;
-
     return el.scrollHeight - el.scrollTop - el.clientHeight < 100;
   };
 
-  const fetchMessages = async () => {
+  const fetchMessages = useCallback(async () => {
     try {
       const res = await getMessages();
 
@@ -53,7 +49,7 @@ export default function ChatPage() {
     } catch (err) {
       console.error(err);
     }
-  };
+  }, [myId]);
 
   useEffect(() => {
     const init = async () => {
@@ -61,12 +57,12 @@ export default function ChatPage() {
       scrollToBottom(false);
     };
     init();
-  }, []);
+  }, [fetchMessages]);
 
   useEffect(() => {
     const interval = setInterval(fetchMessages, 2000);
     return () => clearInterval(interval);
-  }, []);
+  }, [fetchMessages]);
 
   useEffect(() => {
     if (messages.length > prevLengthRef.current && isNearBottom()) {

@@ -14,18 +14,16 @@ import {
   postCommentList,
   postCommentDelete,
 } from "../../apis/comment";
-
+const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
+  education: 1,
+  experience: 2,
+  activity: 3,
+  award: 4,
+  qualification: 5,
+  project: 6,
+  etc: 7,
+};
 export default function CommentPage() {
-  const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
-    education: 1,
-    experience: 2,
-    activity: 3,
-    award: 4,
-    qualification: 5,
-    project: 6,
-    etc: 7,
-  };
-
   const { category, blockId, fieldKey } = useParams<{
     category: CategoryKey;
     blockId: string;
@@ -78,16 +76,12 @@ export default function CommentPage() {
   if (!category || !blockId || !fieldKey) return null;
   if (portfolio.length === 0) return <div>로딩중...</div>;
 
-  const targetItem = portfolio.find((item) => item.blockId == Number(blockId));
+  const targetItem = portfolio.find((item) => item.blockId === Number(blockId));
   if (!targetItem) return <div>데이터 없음</div>;
 
   const fieldLabel =
     CATEGORY_FIELDS[safeCategory]?.find((f) => f.name === fieldKey)?.label ??
     "정보";
-
-  const isPeriodCategory = ["experience", "activity", "project"].includes(
-    safeCategory,
-  );
 
   const getPeriodFieldNames = (category: CategoryKey) => {
     switch (category) {

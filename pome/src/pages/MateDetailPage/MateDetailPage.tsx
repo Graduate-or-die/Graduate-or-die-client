@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { CategoryKey } from "../../constants/categories";
 import * as S from "./MateDetailPage.style";
 import TabBar from "../../components/TabBar";
 import DetailHeader from "../../components/DetailHeader";
 import MateDetailForm from "../../components/MateDetailFrom";
 import { getMatePortfolio } from "../../apis/mate";
-import { useLocation } from "react-router-dom";
+
+const portfolioMap: Record<CategoryKey, number> = {
+  education: 1,
+  experience: 2,
+  activity: 3,
+  award: 4,
+  qualification: 5,
+  project: 6,
+  etc: 7,
+};
 
 export default function MateDetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
+  const location = useLocation();
+
   const safeCategory = category as CategoryKey;
+
   const [education, setEducation] = useState<any | null>(null);
   const [experiences, setExperiences] = useState<any[]>([]);
   const [items, setItems] = useState<any[]>([]);
   const [etc, setEtc] = useState<any | null>(null);
-  const location = useLocation();
+
   const mateId = location.state?.mateId;
 
-  const portfolioMap: Record<CategoryKey, number> = {
-    education: 1,
-    experience: 2,
-    activity: 3,
-    award: 4,
-    qualification: 5,
-    project: 6,
-    etc: 7,
-  };
-
   useEffect(() => {
-    if (!safeCategory) return;
-
     const fetchData = async () => {
       try {
         if (safeCategory === "education") {
@@ -62,10 +62,12 @@ export default function MateDetailPage() {
 
     fetchData();
   }, [safeCategory]);
-  if (!safeCategory) return null;
+  if (!category) return null;
+
   return (
     <>
       <DetailHeader category={safeCategory} />
+
       <S.ContentWrapper>
         <S.FormContainer>
           {safeCategory === "education" && (
@@ -90,6 +92,7 @@ export default function MateDetailPage() {
               ))}
             </>
           )}
+
           {safeCategory === "etc" && etc && (
             <MateDetailForm
               category="etc"
@@ -98,6 +101,7 @@ export default function MateDetailPage() {
               mateId={mateId}
             />
           )}
+
           {safeCategory !== "education" &&
             safeCategory !== "etc" &&
             items.map((item, index) => (
@@ -111,6 +115,7 @@ export default function MateDetailPage() {
             ))}
         </S.FormContainer>
       </S.ContentWrapper>
+
       <TabBar />
     </>
   );
