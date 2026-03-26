@@ -50,3 +50,23 @@ export const postCommentDelete = async (
   );
   return res.data.result;
 };
+
+export const postFieldsUnread = async (
+  portfolioOwnerId: number,
+  body: { typeId: number },
+) => {
+  const res = await jsonAxios.post(`/fields/unread/${portfolioOwnerId}`, body);
+  return res.data.result;
+};
+
+export const postFieldsRead = async (
+  portfolioOwnerId: number,
+  body: {
+    typeId: number;
+    blockId: number;
+    fieldKey: string;
+  },
+) => {
+  const res = await jsonAxios.post(`/fields/read/${portfolioOwnerId}`, body);
+  return res.data.result;
+};

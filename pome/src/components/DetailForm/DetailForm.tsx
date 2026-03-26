@@ -2,9 +2,8 @@ import React, { useRef, useState, useEffect } from "react";
 import * as S from "./DetailForm.style";
 import { CATEGORIES, CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS, Field } from "../../constants/categoryFields";
-import { Link, Check, SelectCheck, Plus, Delete } from "../../icons";
+import { Link, Check, SelectCheck, Plus, RedDot, Delete } from "../../icons";
 import { EtcItem, DetailItem } from "../../types/detail";
-import { hasComment } from "../../constants/comments";
 import { getFileDownload } from "../../apis/portfolio";
 
 export type DetailFormProps = {
@@ -18,9 +17,9 @@ export type DetailFormProps = {
   isSelected?: boolean;
   onToggleSelect?: () => void;
   onFieldClick?: (fieldName: string) => void;
-  commentedFields?: string[];
   isMyPage?: boolean;
   showAttachButton?: boolean;
+  unreadMap?: Set<string>;
 };
 
 export default function DetailForm({
@@ -34,9 +33,9 @@ export default function DetailForm({
   isSelected,
   onToggleSelect,
   onFieldClick,
-  commentedFields,
   isMyPage = false,
   showAttachButton = true,
+  unreadMap,
 }: DetailFormProps) {
   const fields = CATEGORY_FIELDS[category];
   const isEducation = category === "education";
@@ -66,37 +65,30 @@ export default function DetailForm({
   };
 
   const handleFileClick = () => isEditing && fileRef.current?.click();
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setFileName(file.name);
     onChange?.({ ...safeValue, [e.target.name]: file } as DetailItem);
   };
-
   const handleFileDelete = () => {
     const blockId = (safeValue as any).blockId;
     if (blockId && onDeleteFile) onDeleteFile(blockId);
-
     setFileName("");
     if (fileRef.current) fileRef.current.value = "";
-
     onChange?.({ ...safeValue, file: null } as DetailItem);
   };
 
   const handleDownload = async (attachmentId: number, fileName: string) => {
     try {
       const res = await getFileDownload(attachmentId);
-
       const blob = new Blob([res.data]);
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
       link.download = fileName;
       document.body.appendChild(link);
       link.click();
-
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
@@ -106,10 +98,8 @@ export default function DetailForm({
 
   const toggleExpr = (fieldName: string) => {
     if (!isEditing) return;
-
     const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
     const newHasEndAt = !hasEndAt;
-
     const updatedValue: any = {
       ...safeValue,
       hasQualificationEndAt: newHasEndAt,
@@ -117,7 +107,6 @@ export default function DetailForm({
         ? getFieldValue("qualificationEndAt")
         : null,
     };
-
     onChange?.(updatedValue);
   };
 
@@ -153,9 +142,7 @@ export default function DetailForm({
     const startReadOnly = !isEditing || startValue === null;
     const endReadOnly = !isEditing || endValue === null;
     const handleClick = () => {
-      if (!isEditing) {
-        onFieldClick?.(start);
-      }
+      if (!isEditing) onFieldClick?.("period");
     };
     return (
       <S.PeriodBox onClick={handleClick}>
@@ -188,20 +175,16 @@ export default function DetailForm({
       <S.FileContainer>
         <S.FileNameBox
           onClick={() => {
-            if (!fileName && fileRef.current) {
-              fileRef.current.click();
-              return;
-            }
-            if (fileName && attachmentId) {
+            if (!fileName && fileRef.current) fileRef.current.click();
+            else if (fileName && attachmentId)
               handleDownload(attachmentId, fileName);
-            }
           }}
         >
           {fileName || "파일을 첨부하세요"}
         </S.FileNameBox>
         {showAttachButton &&
           fileName &&
-          (category === "qualification" || category === "award") && (
+          ["qualification", "award"].includes(category) && (
             <S.DeleteBox onClick={handleFileDelete}>
               <Delete />
             </S.DeleteBox>
@@ -223,7 +206,6 @@ export default function DetailForm({
     const hasEndAt = (safeValue as any).hasQualificationEndAt ?? true;
     const value = hasEndAt ? getFieldValue(field.name) : null;
     const isDisabled = !hasEndAt;
-
     return (
       <>
         <S.FormBox
@@ -244,24 +226,22 @@ export default function DetailForm({
   const renderLinkField = (field: Field) => (
     <>
       {isEtcItem(safeValue) &&
-        links.map((link, index) => {
-          return (
-            <S.LinkContainer key={index}>
-              <S.LinkIcon>
-                <Link />
-              </S.LinkIcon>
-              <S.LinkBox
-                value={link}
-                onChange={
-                  isEditing
-                    ? (e) => handleLinkChange(index, e.target.value)
-                    : undefined
-                }
-                disabled={!isEditing}
-              />
-            </S.LinkContainer>
-          );
-        })}
+        links.map((link, index) => (
+          <S.LinkContainer key={index}>
+            <S.LinkIcon>
+              <Link />
+            </S.LinkIcon>
+            <S.LinkBox
+              value={link}
+              onChange={
+                isEditing
+                  ? (e) => handleLinkChange(index, e.target.value)
+                  : undefined
+              }
+              disabled={!isEditing}
+            />
+          </S.LinkContainer>
+        ))}
       {isEtcItem(safeValue) && visibleLinkCount < 4 && isEditing && (
         <S.LinkAdd>
           <Plus style={{ color: "#0086AB" }} onClick={handleLinkAdd} />
@@ -272,8 +252,29 @@ export default function DetailForm({
 
   const renderField = (field: Field) => {
     const inputValue = getFieldValue(field.name);
-    const showRedDot = isMyPage && hasComment(category, field.name, value?.id);
 
+    const typeIdMap: Record<CategoryKey, number> = {
+      education: 1,
+      experience: 2,
+      activity: 3,
+      award: 4,
+      qualification: 5,
+      project: 6,
+      etc: 7,
+    };
+
+    const typeId = typeIdMap[category];
+    const blockId = (value as any)?.blockId;
+
+    const isPeriodField = field.kind === "period";
+
+    const showRedDot =
+      isMyPage &&
+      unreadMap &&
+      typeof blockId === "number" &&
+      (isPeriodField
+        ? unreadMap.has(`${typeId}-${blockId}-period`)
+        : unreadMap.has(`${typeId}-${blockId}-${field.name}`));
     const isDisabled =
       !isEditing ||
       (field.kind === "expr" && !(safeValue as any).hasQualificationEndAt);
@@ -284,10 +285,8 @@ export default function DetailForm({
         onClick={() => {
           if (!isEditing) {
             if (field.name === "file") return;
-
             if (field.kind === "period") {
-              const { start } = getPeriodFieldNames(category);
-              onFieldClick?.(start);
+              onFieldClick?.("period");
             } else {
               onFieldClick?.(field.name);
             }
@@ -296,7 +295,11 @@ export default function DetailForm({
       >
         <S.FormLabel>
           {field.label}
-          {showRedDot && <S.RedDotBox></S.RedDotBox>}
+          {showRedDot && (
+            <S.RedDotBox>
+              <RedDot />
+            </S.RedDotBox>
+          )}
         </S.FormLabel>
 
         {field.kind === "period" ? (

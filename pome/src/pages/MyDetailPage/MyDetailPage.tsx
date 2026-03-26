@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import * as S from "./MyDetailPage.style";
 import MyDetailForm from "../../components/MyDetailForm";
 import DetailHeader from "../../components/DetailHeader";
@@ -7,14 +7,18 @@ import TabBar from "../../components/TabBar";
 import { CategoryKey } from "../../constants/categories";
 import { DetailItem } from "../../types/detail";
 import { getPortfolio } from "../../apis/portfolio";
+import { postFieldsUnread } from "../../apis/comment";
 
 export default function MyDetailPage() {
   const { category } = useParams<{ category: CategoryKey }>();
+  const location = useLocation();
+  const navigate = useNavigate();
   const safeCategory = category as CategoryKey;
 
   const [education, setEducation] = useState<DetailItem | null>(null);
   const [experiences, setExperiences] = useState<DetailItem[]>([]);
   const [items, setItems] = useState<DetailItem[]>([]);
+  const [unreadMap, setUnreadMap] = useState<Set<string>>(new Set());
 
   const portfolioMap: Record<CategoryKey, number> = {
     education: 1,
@@ -26,34 +30,72 @@ export default function MyDetailPage() {
     etc: 7,
   };
 
+  const myUserId = Number(localStorage.getItem("userId"));
+
+  type FieldUnread = {
+    typeId: number;
+    blockId: number;
+    fieldKey: string;
+    hasUnread: boolean;
+  };
+
+  const makeKey = (typeId: number, blockId: number, fieldKey: string) =>
+    `${typeId}-${blockId}-${fieldKey}`;
+
+  const fetchUnread = async () => {
+    try {
+      const typeId = portfolioMap[safeCategory];
+
+      const res: FieldUnread[] = await postFieldsUnread(myUserId, { typeId });
+      const map = new Set<string>();
+
+      (res || []).forEach((item) => {
+        if (!item.hasUnread) return;
+
+        const isPeriodField =
+          item.fieldKey.includes("StartAt") || item.fieldKey.includes("EndAt");
+
+        if (isPeriodField) {
+          map.add(`${item.typeId}-${item.blockId}-period`);
+        } else {
+          map.add(makeKey(item.typeId, item.blockId, item.fieldKey));
+        }
+      });
+
+      setUnreadMap(map);
+    } catch {}
+  };
+
   useEffect(() => {
     const fetchPortfolio = async () => {
-      try {
-        if (safeCategory === "education") {
-          const [eduRes, expRes] = await Promise.all([
-            getPortfolio(1),
-            getPortfolio(2),
-          ]);
-
-          setEducation(eduRes?.item?.items?.[0] ?? null);
-          setExperiences(expRes?.item?.items ?? []);
-          return;
-        }
-
-        const data = await getPortfolio(portfolioMap[safeCategory]);
-        setItems(data?.item?.items ?? []);
-      } catch (err) {
-        console.error("조회 실패", err);
+      if (safeCategory === "education") {
+        const [eduRes, expRes] = await Promise.all([
+          getPortfolio(portfolioMap.education),
+          getPortfolio(portfolioMap.experience),
+        ]);
+        setEducation(eduRes?.item?.items?.[0] ?? null);
+        setExperiences(expRes?.item?.items ?? []);
+        return;
       }
+      const data = await getPortfolio(portfolioMap[safeCategory]);
+      setItems(data?.item?.items ?? []);
     };
-
     fetchPortfolio();
   }, [safeCategory]);
+
+  useEffect(() => {
+    if (!safeCategory) return;
+    fetchUnread();
+  }, [safeCategory]);
+
+  const handleFieldClick = (blockId: number | undefined, fieldKey: string) => {
+    if (!blockId) return;
+    navigate(`/comment/${safeCategory}/${blockId}/${fieldKey}`);
+  };
 
   return (
     <>
       <DetailHeader category={safeCategory} />
-
       <S.FormContainer>
         {safeCategory === "education" && education && (
           <>
@@ -61,19 +103,27 @@ export default function MyDetailPage() {
               category="education"
               value={education}
               isEditing={false}
+              unreadMap={unreadMap}
+              onFieldClick={(fieldKey) =>
+                handleFieldClick(education?.blockId, fieldKey)
+              }
+              isMyPage
             />
-
             {experiences.map((item) => (
               <MyDetailForm
                 key={item.blockId}
                 category="experience"
                 value={item}
                 isEditing={false}
+                unreadMap={unreadMap}
+                onFieldClick={(fieldKey) =>
+                  handleFieldClick(item?.blockId, fieldKey)
+                }
+                isMyPage
               />
             ))}
           </>
         )}
-
         {safeCategory !== "education" &&
           items.map((item) => (
             <MyDetailForm
@@ -81,10 +131,14 @@ export default function MyDetailPage() {
               category={safeCategory}
               value={item}
               isEditing={false}
+              unreadMap={unreadMap}
+              onFieldClick={(fieldKey) =>
+                handleFieldClick(item?.blockId, fieldKey)
+              }
+              isMyPage
             />
           ))}
       </S.FormContainer>
-
       <TabBar />
     </>
   );
