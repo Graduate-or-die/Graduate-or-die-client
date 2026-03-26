@@ -9,7 +9,7 @@ export const PomeStyles = css`
     padding: 0;
     overflow-x: hidden;
     overflow-y: auto;
-    background-color: #d9d7d7;
+    background-color: #e8e8e8;
   }
 
   button,

@@ -1,6 +1,6 @@
 import React from "react";
 import * as S from "./Header.style";
-import { Alarm, ArrowLeft, PomeLogo } from "../../icons";
+import { ArrowLeft, PomeLogo } from "../../icons";
 import { useNavigate } from "react-router-dom";
 export default function Header() {
   const navigate = useNavigate();
@@ -17,9 +17,7 @@ export default function Header() {
             </button>
           </S.LeftBox>
           <PomeLogo />
-          <S.RightBox>
-            <Alarm />
-          </S.RightBox>
+          <S.RightBox></S.RightBox>
         </S.HeaderBox>
       </S.Header>
     </>

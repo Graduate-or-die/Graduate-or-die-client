@@ -35,7 +35,7 @@ export const DropBox = styled.div`
 export const BorderLine = styled.div`
   width: 100%;
   height: 0.3px;
-  background: #313334;
+  background: #6b6967;
   margin: 0 auto;
 `;
 export const MenuHeader = styled.div`

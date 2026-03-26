@@ -75,6 +75,7 @@ export const EtcBox = styled.div`
   position: relative;
   display: flex;
   align-items: center;
+  cursor: pointer;
 `;
 export const CommentBox = styled.div`
   display: flex;

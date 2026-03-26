@@ -157,10 +157,10 @@ export default function MyCommentPage() {
 
           <S.CommentContainer>
             <S.CommentRow>
-              받은 댓글
+              Comment
               {comments.length > 0 && (
                 <S.EditButton onClick={goToEdit}>
-                  코멘트 반영하러 가기 →
+                  Comment 반영하러 가기 →
                 </S.EditButton>
               )}
             </S.CommentRow>
