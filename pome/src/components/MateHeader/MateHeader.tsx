@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import * as S from "./MateHeader.style";
-import { PomeLogo, Alarm } from "../../icons";
+import { PomeLogo } from "../../icons";
 import { useNavigate } from "react-router-dom";
 import { DefaultProfile } from "../../assets";
 import { getMateProfile, getProfileImage } from "../../apis/mate";
@@ -38,9 +38,7 @@ export default function MateHeader() {
             )}
           </S.ProfileBox>
           <PomeLogo />
-          <S.AlarmBox>
-            <Alarm />
-          </S.AlarmBox>
+          <S.AlarmBox></S.AlarmBox>
         </S.HeaderBox>
       </S.Header>
     </>

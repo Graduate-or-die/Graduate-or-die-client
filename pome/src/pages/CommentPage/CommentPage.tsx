@@ -85,6 +85,40 @@ export default function CommentPage() {
     CATEGORY_FIELDS[safeCategory]?.find((f) => f.name === fieldKey)?.label ??
     "정보";
 
+  const isPeriodCategory = ["experience", "activity", "project"].includes(
+    safeCategory,
+  );
+
+  const getPeriodFieldNames = (category: CategoryKey) => {
+    switch (category) {
+      case "experience":
+        return { start: "experienceStartAt", end: "experienceEndAt" };
+      case "activity":
+        return { start: "activityStartAt", end: "activityEndAt" };
+      case "project":
+        return { start: "projectStartAt", end: "projectEndAt" };
+      default:
+        return { start: "", end: "" };
+    }
+  };
+  let displayValue = "-";
+
+  const { start, end } = getPeriodFieldNames(safeCategory);
+
+  const isPeriodField = fieldKey === start || fieldKey === end;
+
+  if (isPeriodField) {
+    const startValue = targetItem?.[start];
+    const endValue = targetItem?.[end];
+
+    displayValue =
+      startValue || endValue
+        ? `${startValue ?? ""} ~ ${endValue ?? "현재"}`
+        : "-";
+  } else {
+    displayValue = targetItem?.[fieldKey] ?? "-";
+  }
+
   const handleAddComment = async (content: string) => {
     if (!mateId) return;
 
@@ -166,9 +200,7 @@ export default function CommentPage() {
       <S.ContentWrapper>
         <S.FormContainer>
           <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>
-          <S.FormBoard>
-            {targetItem[fieldKey as keyof typeof targetItem] ?? "-"}
-          </S.FormBoard>
+          <S.FormBoard>{displayValue}</S.FormBoard>
         </S.FormContainer>
 
         <S.CommentContainer>

@@ -35,6 +35,7 @@ export const ProfileBox = styled.div`
     height: 100%;
     object-fit: cover;
   }
+  cursor: pointer;
 `;
 export const AlarmBox = styled.div`
   width: 39px;

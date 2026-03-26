@@ -1,4 +1,3 @@
-export { ReactComponent as Alarm } from "./Alarm.svg";
 export { ReactComponent as ArrowLeft } from "./ArrowLeft.svg";
 export { ReactComponent as Check } from "./Check.svg";
 export { ReactComponent as EditPencil } from "./EditPencil.svg";
