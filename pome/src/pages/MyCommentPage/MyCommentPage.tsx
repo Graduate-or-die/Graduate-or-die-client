@@ -7,7 +7,7 @@ import TabBar from "../../components/TabBar";
 import { CategoryKey } from "../../constants/categories";
 import { CATEGORY_FIELDS } from "../../constants/categoryFields";
 import { getPortfolio } from "../../apis/portfolio";
-import { postCommentList } from "../../apis/comment";
+import { postCommentList, postFieldsRead } from "../../apis/comment";
 
 export default function MyCommentPage() {
   const { category, blockId, fieldKey } = useParams<{
@@ -21,8 +21,11 @@ export default function MyCommentPage() {
 
   const [portfolio, setPortfolio] = useState<any[]>([]);
   const [comments, setComments] = useState<any[]>([]);
+  const [loadingComments, setLoadingComments] = useState(false);
 
   const safeCategory = category as CategoryKey;
+  const myUserId = Number(localStorage.getItem("userId"));
+  const readCalledRef = useRef(false);
 
   const CATEGORY_TYPE_ID: Record<CategoryKey, number> = {
     education: 1,
@@ -33,70 +36,143 @@ export default function MyCommentPage() {
     project: 6,
     etc: 7,
   };
-  const myUserId = Number(localStorage.getItem("userId"));
+  const getRealFieldKeys = (category: CategoryKey, fieldKey: string) => {
+    if (fieldKey !== "period") return [fieldKey];
+
+    switch (category) {
+      case "experience":
+        return ["experienceStartAt", "experienceEndAt"];
+      case "activity":
+        return ["activityStartAt", "activityEndAt"];
+      case "project":
+        return ["projectStartAt", "projectEndAt"];
+      default:
+        return [];
+    }
+  };
+  const handleRead = async () => {
+    if (readCalledRef.current) return;
+    readCalledRef.current = true;
+
+    if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+
+    const typeId = CATEGORY_TYPE_ID[safeCategory];
+
+    const numericBlockId = Number(blockId);
+
+    if (!typeId || isNaN(numericBlockId)) return;
+
+    try {
+      const realFieldKeys = getRealFieldKeys(safeCategory, fieldKey);
+
+      await Promise.all(
+        realFieldKeys.map((key) =>
+          postFieldsRead(myUserId, {
+            typeId,
+            blockId: numericBlockId,
+            fieldKey: key,
+          }),
+        ),
+      );
+    } catch (e) {
+      console.error("read 실패", e);
+    }
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        if (!safeCategory) return;
+    if (!safeCategory) return;
 
+    const fetchPortfolio = async () => {
+      try {
         const typeId = CATEGORY_TYPE_ID[safeCategory];
         const res = await getPortfolio(typeId);
-
         setPortfolio(res?.item?.items ?? []);
       } catch (e) {
         console.error(e);
       }
     };
 
-    fetchData();
+    fetchPortfolio();
   }, [safeCategory]);
 
   useEffect(() => {
-    const fetchComments = async () => {
-      try {
-        if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+    return () => {
+      if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
 
-        const typeId = CATEGORY_TYPE_ID[safeCategory];
+      const typeId = CATEGORY_TYPE_ID[safeCategory];
 
-        const res = await postCommentList(myUserId, {
-          typeId,
-          blockId: Number(blockId),
-          fieldKey,
-        });
-        console.log(res);
-        setComments(res ?? []);
-      } catch (e) {
-        console.error(e);
-      }
+      const realFieldKeys = getRealFieldKeys(safeCategory, fieldKey);
+
+      Promise.all(
+        realFieldKeys.map((key) =>
+          postFieldsRead(myUserId, {
+            typeId,
+            blockId: Number(blockId),
+            fieldKey: key,
+          }),
+        ),
+      ).catch((e) => console.error("read 실패", e));
+    };
+  }, [myUserId, safeCategory, blockId, fieldKey]);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      handleRead();
     };
 
-    fetchComments();
-  }, [myUserId, safeCategory, blockId, fieldKey]);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [blockId, fieldKey]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [comments]);
 
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!myUserId || !safeCategory || !blockId || !fieldKey) return;
+
+      setLoadingComments(true);
+
+      const typeId = CATEGORY_TYPE_ID[safeCategory];
+      const numericBlockId = Number(blockId);
+
+      try {
+        const realFieldKeys = getRealFieldKeys(safeCategory, fieldKey);
+
+        const results = await Promise.all(
+          realFieldKeys.map((key) =>
+            postCommentList(myUserId, {
+              typeId,
+              blockId: numericBlockId,
+              fieldKey: key,
+            }),
+          ),
+        );
+
+        const merged = results.flatMap((res) => res || []);
+        setComments(merged);
+      } catch (e) {
+        console.error("댓글 조회 실패", e);
+      } finally {
+        setLoadingComments(false);
+      }
+    };
+
+    fetchComments();
+  }, [myUserId, safeCategory, blockId, fieldKey]);
   if (!category || !blockId || !fieldKey) return null;
+  if (portfolio.length === 0) return <div>로딩중...</div>;
 
-  if (portfolio.length === 0) {
-    return <div>로딩중...</div>;
-  }
-
-  const targetItem = portfolio.find((item) => item.blockId == Number(blockId));
-
-  if (!targetItem) {
-    return <div>데이터 없음</div>;
-  }
+  const targetItem = portfolio.find((item) => item.blockId === Number(blockId));
+  if (!targetItem) return <div>데이터 없음</div>;
 
   const fieldLabel =
     CATEGORY_FIELDS[safeCategory]?.find((f) => f.name === fieldKey)?.label ??
     "정보";
-
-  const isPeriodCategory = ["experience", "activity", "project"].includes(
-    safeCategory,
-  );
 
   const getPeriodFieldNames = (category: CategoryKey) => {
     switch (category) {
@@ -112,35 +188,22 @@ export default function MyCommentPage() {
   };
 
   let displayValue = "-";
+  const { start, end } = getPeriodFieldNames(safeCategory);
+  const isPeriodField = fieldKey === "period";
 
-  if (isPeriodCategory) {
-    const { start, end } = getPeriodFieldNames(safeCategory);
-
-    const isPeriodField =
-      fieldKey === start ||
-      fieldKey === end ||
-      fieldKey.toLowerCase().includes("period");
-
-    if (isPeriodField) {
-      const startValue = targetItem?.[start];
-      const endValue = targetItem?.[end];
-
-      displayValue =
-        startValue || endValue
-          ? `${startValue ?? ""} ~ ${endValue ?? "현재"}`
-          : "-";
-    } else {
-      const raw = targetItem?.[fieldKey];
-      displayValue =
-        raw == null ? "-" : Array.isArray(raw) ? raw.join("\n") : String(raw);
-    }
-  } else {
-    const raw = targetItem?.[fieldKey];
+  if (isPeriodField) {
+    const startValue = targetItem?.[start];
+    const endValue = targetItem?.[end];
     displayValue =
-      raw == null ? "-" : Array.isArray(raw) ? raw.join("\n") : String(raw);
+      startValue || endValue
+        ? `${startValue ?? ""} ~ ${endValue ?? "현재"}`
+        : "-";
+  } else {
+    displayValue = targetItem?.[fieldKey] ?? "-";
   }
 
-  const goToEdit = () => {
+  const goToEdit = async () => {
+    await handleRead();
     navigate(`/home/detail/${safeCategory}`);
   };
 
@@ -148,7 +211,6 @@ export default function MyCommentPage() {
     <>
       <S.PageWrapper>
         <DetailHeader category={safeCategory} />
-
         <S.ContentWrapper>
           <S.FormContainer>
             <S.FormFieldBox>{fieldLabel}</S.FormFieldBox>
@@ -157,16 +219,18 @@ export default function MyCommentPage() {
 
           <S.CommentContainer>
             <S.CommentRow>
-              Comment
+              받은 댓글
               {comments.length > 0 && (
                 <S.EditButton onClick={goToEdit}>
-                  Comment 반영하러 가기 →
+                  코멘트 반영하러 가기 →
                 </S.EditButton>
               )}
             </S.CommentRow>
 
             <S.CommentBox>
-              {comments.length === 0 ? (
+              {loadingComments ? (
+                <S.NoCommentBox>댓글 불러오는 중...</S.NoCommentBox>
+              ) : comments.length === 0 ? (
                 <S.NoCommentBox>아직 받은 댓글이 없어요.</S.NoCommentBox>
               ) : (
                 comments.map((c) => (
