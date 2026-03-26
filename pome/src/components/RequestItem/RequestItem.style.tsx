@@ -15,6 +15,12 @@ export const ProfileBox = styled.div`
   width: 53px;
   height: 53px;
   margin-left: 13px;
+  img {
+    width: 53px;
+    height: 53px;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 `;
 export const NameBox = styled.div`
   color: #313334;
