@@ -33,6 +33,7 @@ export const KakaoContainer = styled.div`
     position: absolute;
     left: 18px;
   }
+  cursor: pointer;
 `;
 export const KakaoBox = styled.div`
   color: #313334;

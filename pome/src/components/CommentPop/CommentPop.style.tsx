@@ -23,4 +23,5 @@ export const PopBox = styled.div<{ $cancel?: boolean }>`
   align-items: center;
   gap: 3px;
   color: ${({ $cancel }) => ($cancel ? "#9E9E9E" : "#222")};
+  cursor: pointer;
 `;
