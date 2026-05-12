@@ -45,7 +45,7 @@ const MenuSection = memo(
     onToggleVisibility,
     mateId,
   }: MenuSectionProps) => {
-    const [isToggleOpen, setIsToggleOpen] = useState(false);
+    const [isToggleOpen, setIsToggleOpen] = useState(true);
     const [isSwitchOpen, setIsSwitchOpen] = useState(isPublic);
     const navigate = useNavigate();
 

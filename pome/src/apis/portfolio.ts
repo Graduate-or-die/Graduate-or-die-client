@@ -216,3 +216,11 @@ export const getFileDownload = async (attachmentId: number) => {
   });
   return res;
 };
+
+export const getExport = async (format: string) => {
+  const res = await jsonAxios.get(`/portfolios/export/pdf/${format}`, {
+    responseType: "blob",
+  });
+
+  return res;
+};

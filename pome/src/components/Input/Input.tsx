@@ -1,6 +1,7 @@
 import React from "react";
 import * as S from "./Input.style";
 import { Send } from "../../icons";
+
 type InputProps = {
   value: string;
   onSubmit: (value: string) => void;
@@ -8,21 +9,27 @@ type InputProps = {
   placeholder?: string;
 };
 
-function Input(
-  { value, onSubmit, onChange, placeholder }: InputProps,
-  ref: React.Ref<HTMLInputElement>,
-) {
-  const handleSubmit = () => {
-    if (!value.trim()) return;
-    onSubmit(value);
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ value, onSubmit, onChange, placeholder }, ref) => {
+    
+    const handleSubmit = () => {
+      if (!value.trim()) return;
 
-    if (ref && typeof ref !== "function") {
-      ref.current?.focus();
-    }
-  };
+      onSubmit(value);
+    };
 
-  return (
-    <>
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSubmit();
+      }
+    };
+
+    const handleClick = () => {
+      handleSubmit();
+    };
+
+    return (
       <S.InputContainer>
         <S.InputRow>
           <S.InputBox
@@ -30,19 +37,16 @@ function Input(
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
+            onKeyDown={handleKeyDown}
           />
-          <S.SendIconBox onClick={handleSubmit}>
+
+          <S.SendIconBox onClick={handleClick}>
             <Send />
           </S.SendIconBox>
         </S.InputRow>
       </S.InputContainer>
-    </>
-  );
-}
-export default React.forwardRef<HTMLInputElement, InputProps>(Input);
+    );
+  }
+);
+
+export default Input;
