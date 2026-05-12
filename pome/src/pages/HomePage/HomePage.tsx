@@ -5,7 +5,7 @@ import Menu from "../../components/Menu";
 import HomeBadge from "../../components/HomeBadge";
 import * as S from "./HomePage.style";
 import { Star } from "../../icons";
-import { getVisibility } from "../../apis/portfolio";
+import { getVisibility, getExport } from "../../apis/portfolio";
 import { getMyPage } from "../../apis/user";
 export default function HomePage() {
   const [visibilityMap, setVisibilityMap] = useState<Record<number, boolean>>(
@@ -59,9 +59,33 @@ export default function HomePage() {
     }));
   };
 
+  const handleDownload = async () => {
+    try {
+      const res = await getExport("full");
+
+      console.log(res);
+
+      const url = window.URL.createObjectURL(res.data);
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "portfolio.pdf";
+
+      document.body.appendChild(link);
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
   return (
     <S.PageWrapper>
-      <Header />
+      <Header showDownload handleDownload={handleDownload} />
 
       <S.ContentWrapper>
         <S.CenterWrapper>

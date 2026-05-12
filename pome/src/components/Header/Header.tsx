@@ -1,8 +1,17 @@
 import React from "react";
 import * as S from "./Header.style";
-import { ArrowLeft, PomeLogo } from "../../icons";
+import { ArrowLeft, PomeLogo, Down } from "../../icons";
 import { useNavigate } from "react-router-dom";
-export default function Header() {
+
+type HeaderProps = {
+  showDownload?: boolean;
+  handleDownload?: () => void;
+};
+
+export default function Header({
+  showDownload = false,
+  handleDownload,
+}: HeaderProps) {
   const navigate = useNavigate();
   const goBack = () => {
     navigate(-1);
@@ -17,7 +26,9 @@ export default function Header() {
             </button>
           </S.LeftBox>
           <PomeLogo />
-          <S.RightBox></S.RightBox>
+          <S.RightBox>
+            {showDownload && <Down onClick={handleDownload} />}
+          </S.RightBox>
         </S.HeaderBox>
       </S.Header>
     </>
